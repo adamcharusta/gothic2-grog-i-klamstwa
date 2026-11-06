@@ -27,6 +27,7 @@ This holds even when the user talks to you in Polish. Only player-facing game te
 | [docs/06-benchmark-and-testing.md](docs/06-benchmark-and-testing.md) | Benchmark logs, summaries, test strategy, success criterion |
 | [docs/07-decisions.md](docs/07-decisions.md) | Decision log: who decided what and why |
 | [docs/08-open-questions.md](docs/08-open-questions.md) | Questions still waiting for the user |
+| [docs/engine-upstream.md](docs/engine-upstream.md) | OpenGothic fork/submodule, upstream SHAs, how to merge upstream |
 | [docs/09-repo-ci-and-versioning.md](docs/09-repo-ci-and-versioning.md) | Branches (master/develop), GitHub Actions, release & beta packages, versioning, .gitattributes/.editorconfig/.gitignore |
 | [docs/plans/README.md](docs/plans/README.md) | Implementation roadmap and plans (one file per plan) |
 | [work/](work/) | Completed task reports + [work/INDEX.md](work/INDEX.md) |

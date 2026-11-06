@@ -31,4 +31,13 @@ assert_contains "$ec" "end_of_line = lf" "editorconfig default LF"
 assert_contains "$ec" "[*.{bat,cmd,iss}]" "editorconfig CRLF section"
 assert_contains "$(sed -n '/\[\*\.{bat,cmd,iss}\]/,/^\[/p' .editorconfig 2>/dev/null)" "end_of_line = crlf" "editorconfig CRLF for Windows scripts"
 
+# Engine submodule (OpenGothic fork)
+if [[ -f .gitmodules ]]; then
+  assert_eq "https://github.com/adamcharusta/OpenGothic.git" "$(git config -f .gitmodules submodule.engine.url)" "engine submodule url"
+  assert_eq "grog/main" "$(git config -f .gitmodules submodule.engine.branch)" "engine submodule branch"
+else
+  _fail ".gitmodules missing"
+fi
+assert_ok "engine-upstream.md records an upstream SHA" -- grep -Eq '[0-9a-f]{40}' docs/engine-upstream.md
+
 finish
