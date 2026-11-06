@@ -1,0 +1,28 @@
+# CI for pull requests and feature branches: build + tests + package (not published).
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches-ignore:
+      - master
+      - develop
+
+permissions:
+  contents: read
+
+jobs:
+  version:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: v
+        run: echo "version=$(bash tools/version.sh dev ${{ github.run_number }})" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: version
+    uses: ./.github/workflows/_build.yml
+    with:
+      version: ${{ needs.version.outputs.version }}

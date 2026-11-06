@@ -1,0 +1,54 @@
+# Push to develop: build and publish a beta pre-release vX.Y.Z-beta.N.
+name: Beta
+
+on:
+  push:
+    branches:
+      - develop
+
+permissions:
+  contents: read
+
+concurrency:
+  group: beta
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+      - id: v
+        run: echo "version=$(bash tools/version.sh beta ${{ github.run_number }})" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: version
+    uses: ./.github/workflows/_build.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+
+  publish:
+    needs: [version, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v6
+        with:
+          name: GrogIKlamstwa-${{ needs.version.outputs.version }}
+          path: dist
+      - name: Publish pre-release
+        run: |
+          prev="$(git describe --tags --abbrev=0 --match 'v*' 2>/dev/null || true)"
+          bash tools/changelog.sh $prev > notes.md
+          gh release create "v$VERSION" --prerelease --target "$GITHUB_SHA" \
+            --title "Grog i kłamstwa $VERSION (beta)" --notes-file notes.md \
+            "dist/GrogIKlamstwa-$VERSION-win64.zip" "dist/GrogIKlamstwa-$VERSION-setup.exe"
