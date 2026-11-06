@@ -1,12 +1,10 @@
 # CI for pull requests and feature branches: build + tests + package (not published).
 name: CI
 
+# Only pull_request (plus manual runs): a push trigger would build every PR commit twice.
 on:
   pull_request:
-  push:
-    branches-ignore:
-      - master
-      - develop
+  workflow_dispatch:
 
 permissions:
   contents: read

@@ -24,6 +24,7 @@ assert_contains "$build" "tools/package.sh" "_build packages"
 
 assert_contains "$ci" "pull_request" "ci runs on PRs"
 assert_contains "$ci" "version.sh dev" "ci uses dev version"
+assert_not_contains "$ci" "push:" "ci does not double-build on push"
 
 assert_contains "$beta" "- develop" "beta triggers on develop"
 assert_not_contains "$beta" "- master" "beta does not trigger on master"
