@@ -43,3 +43,5 @@ Every significant decision goes here (date, who, decision, why). Changing a deci
 | 2026-11-07 | designer | AI-layer state serialised with OpenGothic saves, versioned | Follows from save/load requirement; needed for full Gothic too |
 | 2026-11-07 | designer | Build order: vertical slice first (Greg → Skip → Matt, one scenario type, one provider, no events), then the full release | De-risk engine hooks early; release scope unchanged |
 | 2026-11-07 | user | Design approved; public repo `adamcharusta/gothic2-grog-i-klamstwa` created | — |
+| 2026-11-07 | designer | Project licence MIT (same as OpenGothic), copyright Adam Charusta | Public repo needs a licence; user may change it |
+| 2026-11-07 | designer | Implementation split into 5 plans (docs/plans/README.md); only the next plan is written in detail | Later plans depend on findings |
