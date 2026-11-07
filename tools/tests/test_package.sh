@@ -32,6 +32,8 @@ for p in bin/Gothic2Notr.exe bin/libstdc++-6.dll system/GrogIKlamstwa.ini Start-
   assert_contains "$list" "$D/$p" "zip contains $p"
 done
 STAGE="$TMP/out ł/$D"
+tp="$(cat "$STAGE/LICENSES/THIRD_PARTY.md" 2>/dev/null)"
+for lib in libwinpthread libstdc++ libgcc_s; do assert_contains "$tp" "$lib" "THIRD_PARTY lists bundled $lib"; done
 assert_eq "0.1.0-beta.3" "$(tr -d '\r\n' < "$STAGE/VERSION")" "VERSION inside package"
 # -U: MSYS grep strips CR in text mode
 assert_ok "launcher has CRLF" -- grep -qU $'\r$' "$STAGE/Start-GrogIKlamstwa.bat"

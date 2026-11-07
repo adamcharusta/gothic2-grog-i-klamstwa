@@ -18,6 +18,7 @@ assert_contains "$src" "steamapps\\common\\Gothic II" "Steam default path"
 assert_contains "$src" 'Name: "polish"' "Polish language"
 assert_contains "$src" 'Name: "english"' "English language"
 assert_contains "$src" "gothic_path.txt" "writes gothic_path.txt"
+assert_contains "$src" "SaveStringsToUTF8FileWithoutBOM" "gothic_path.txt written as UTF-8 (launcher reads it with chcp 65001)"
 assert_contains "$src" "-game:GrogIKlamstwa.ini" "shortcut launches the mod"
 assert_not_contains "$src" ".vdf" "no game archives referenced"
 

@@ -16,5 +16,12 @@ OpenGothic bundles the following libraries; each is used under the licence state
 | miniz | https://github.com/richgel999/miniz | MIT |
 | edd-dbg | vendored in OpenGothic `lib/edd-dbg` | see project |
 
+The Windows build also ships MinGW-w64 runtime libraries:
+
+| File | Project | Licence |
+|------|---------|---------|
+| `libstdc++-6.dll`, `libgcc_s_seh-1.dll` | GCC (https://gcc.gnu.org) | GPL-3.0 with GCC Runtime Library Exception |
+| `libwinpthread-1.dll` | MinGW-w64 winpthreads (https://www.mingw-w64.org) | MIT and BSD-3-Clause; copyright notices retained in the upstream `COPYING` file |
+
 Gothic, Gothic II and Night of the Raven are trademarks of their respective owners.
 This mod contains no original game files; a legal copy of Gothic II: Night of the Raven is required.

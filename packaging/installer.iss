@@ -103,7 +103,14 @@ begin
 end;
 
 procedure CurStepChanged(CurStep: TSetupStep);
+var
+  Lines: TArrayOfString;
 begin
   if CurStep = ssPostInstall then
-    SaveStringToFile(ExpandConstant('{app}\gothic_path.txt'), GetGothicDir(''), False);
+  begin
+    // UTF-8 without BOM: Start-GrogIKlamstwa.bat reads it with chcp 65001 (non-ASCII paths).
+    SetArrayLength(Lines, 1);
+    Lines[0] := GetGothicDir('');
+    SaveStringsToUTF8FileWithoutBOM(ExpandConstant('{app}\gothic_path.txt'), Lines, False);
+  end;
 end;
