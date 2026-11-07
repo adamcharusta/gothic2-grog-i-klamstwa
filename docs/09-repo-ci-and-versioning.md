@@ -77,3 +77,8 @@ Tags: **[U]** user · **[P]** proposal · **[B]** builder.
 - Run `git init` here; the default branch is `master`, then create `develop`.
 - GitHub repo: the user creates it (or authorises the agent to). Pushing to GitHub needs the user's approval.
 - OpenGothic fork: a separate GitHub fork added as a **git submodule** (e.g. `engine/`), so upstream merges stay clean.
+
+## Branch protection (enabled 2026-11-07)
+
+`master` and `develop`: changes only via pull request (0 approvals required, single maintainer), required status checks
+`build / checks`, `build / engine`, `build / package`, no force pushes, no deletion. Admins are not forced (`enforce_admins: false`).

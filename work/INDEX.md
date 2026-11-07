@@ -11,3 +11,4 @@ One row per task. Details in the report file. Template: [_TEMPLATE.md](_TEMPLATE
 | 0005 | 2026-11-07 | done | Windows installer (Inno Setup) | [0005-installer.md](0005-installer.md) |
 | 0006 | 2026-11-07 | done | OpenGothic fork as engine submodule | [0006-engine-submodule.md](0006-engine-submodule.md) |
 | 0007 | 2026-11-07 | done | CI workflows, first beta, review fixes | [0007-ci-workflows-and-review-fixes.md](0007-ci-workflows-and-review-fixes.md) |
+| 0008 | 2026-11-07 | partial | Branch protection, beta 2 (user smoke test pending) | [0008-branch-protection-beta2.md](0008-branch-protection-beta2.md) |
