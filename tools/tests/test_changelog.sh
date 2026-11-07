@@ -11,6 +11,7 @@ c() { git commit -q --allow-empty -m "$1"; }
 c "chore: base"; BASE="$(git rev-parse HEAD)"
 c "feat: a"; FEAT="$(git rev-parse HEAD)"
 c "fix: b"; c "docs: c"; c "refactor: d"; c "feat(ui): e"
+git checkout -q -b side && c "fix: side" && git checkout -q - && git merge -q --no-ff -m "Merge pull request #9 from x/side" side
 
 out="$(bash tools/changelog.sh)"
 assert_contains "$out" "## Features" "features section"
@@ -22,6 +23,8 @@ assert_contains "$out" "## Maintenance" "maintenance section"
 assert_contains "$out" "- c (" "docs listed"
 assert_contains "$out" "## Other" "other section"
 assert_contains "$out" "- d (" "refactor listed"
+
+assert_not_contains "$out" "Merge pull request" "merge commits excluded"
 
 out2="$(bash tools/changelog.sh "$FEAT")"
 assert_not_contains "$out2" "- a (" "from-ref excludes older commits"

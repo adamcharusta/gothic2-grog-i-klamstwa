@@ -20,7 +20,7 @@ while IFS=$'\t' read -r sha subject; do
     docs|chore|ci|build|test|style) maintenance+=("$line") ;;
     *) other+=("$line") ;;
   esac
-done < <(git log --format='%h%x09%s' "$range")
+done < <(git log --no-merges --format='%h%x09%s' "$range")
 
 section() {
   local title="$1"; shift

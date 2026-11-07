@@ -18,7 +18,8 @@ done
 [[ -n "$version" && -n "$engine" && -n "$out" ]] || die 1 "usage: package.sh --version <v> --engine-dir <dir> --out <dir>"
 [[ -f "$engine/Gothic2Notr.exe" ]] || die 3 "Gothic2Notr.exe not found in $engine"
 
-root="$(git rev-parse --show-toplevel)"
+# Resolve the repo from the script location, not the current directory.
+root="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 [[ -f "$root/engine/LICENSE" ]] || die 3 "engine/LICENSE not found (is the engine submodule initialised?)"
 
 name="GrogIKlamstwa-$version-win64"
@@ -27,8 +28,19 @@ zipfile="$out/$name.zip"
 rm -rf "$stage" "$zipfile"
 mkdir -p "$stage/bin" "$stage/system" "$stage/LICENSES"
 
-# Engine binaries: everything the engine build produced (exe, dlls, ...).
-cp -r "$engine"/. "$stage/bin/"
+# Engine binaries: only known files are allowed. Anything else (original game binaries,
+# build junk, key files) is refused rather than silently shipped or dropped.
+allowed_bin=(Gothic2Notr.exe libTempest.dll libgcc_s_seh-1.dll libstdc++-6.dll libwinpthread-1.dll)
+while IFS= read -r -d '' f; do
+  rel="${f#"$engine"/}"
+  ok=0
+  for a in "${allowed_bin[@]}"; do [[ "$rel" == "$a" ]] && ok=1; done
+  if (( ! ok )); then
+    rm -rf "$stage"
+    die 4 "forbidden file in package: bin/$rel (not an engine binary)"
+  fi
+  cp "$f" "$stage/bin/"
+done < <(find "$engine" -mindepth 1 \( -type f -o -type d \) -print0)
 
 # Mod files
 iconv -f UTF-8 -t WINDOWS-1250 "$root/packaging/system/GrogIKlamstwa.ini" \
@@ -42,10 +54,10 @@ cp "$root/packaging/THIRD_PARTY.md" "$stage/LICENSES/THIRD_PARTY.md"
 
 # Refuse forbidden content: AI key files, original game files, API keys in text files.
 forbidden="$(cd "$stage" && {
-  find . -type f \( -iname 'GrogAI.ini' -o -iname '*.local.ini' -o -name '.env' \
-    -o -iname '*.vdf' -o -iname '*.mod' -o -iname '*.zen' -o -iname '*.dat' \) -print
-  find . -type d \( -name 'Data' -o -name '_work' \) -print
-  grep -rlE --exclude='*.exe' --exclude='*.dll' 'sk-[A-Za-z0-9_-]{20,}' . || true
+  find . -type f \( \( -iname 'GrogAI*.ini*' ! -name 'GrogAI.example.ini' \) -o -iname '*.local.ini' -o -name '.env' \
+    -o -iname '*.vdf' -o -iname '*.mod' -o -iname '*.zen' -o -iname '*.dat' -o -iname '*.sav' \) -print
+  find . -type d \( -iname 'Data' -o -iname '_work' \) -print
+  grep -rlE --exclude='*.exe' --exclude='*.dll' 'sk-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{30,}' . || true
 })"
 if [[ -n "$forbidden" ]]; then
   rm -rf "$stage"
