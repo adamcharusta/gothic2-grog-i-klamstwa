@@ -27,6 +27,9 @@ a potem uruchom `Start-GrogIKlamstwa.bat`.
 ## Konfiguracja AI
 
 Skopiuj `GrogAI.example.ini` jako `GrogAI.ini` i wpisz dostawcę, model i klucz API. Nigdy nie udostępniaj pliku `GrogAI.ini`.
+Połóż go obok `Start-GrogIKlamstwa.bat` (instalacja z zipa) albo w `%APPDATA%\GrogIKlamstwa\` (zalecane przy instalatorze, bo do Program Files nie da się pisać). Logi trafiają do `logs\` obok moda albo do `%APPDATA%\GrogIKlamstwa\logs`.
+
+W grze: podejdź do pirata i zagadaj jak zwykle. Wpisz kwestię i naciśnij Enter; **Enter na pustej linii**, Esc albo **KONIEC** kończy rozmowę.
 
 ### Jak zdobyć klucz API
 

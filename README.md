@@ -27,6 +27,9 @@ then run `Start-GrogIKlamstwa.bat`.
 ## AI configuration
 
 Copy `GrogAI.example.ini` to `GrogAI.ini` and fill in the provider, model and API key. Never share `GrogAI.ini`.
+Put it next to `Start-GrogIKlamstwa.bat` (zip install) or in `%APPDATA%\GrogIKlamstwa\` (recommended for the installer, since Program Files is not writable). Logs go to `logs\` next to the mod or to `%APPDATA%\GrogIKlamstwa\logs`.
+
+In game: walk up to a pirate and talk as usual. Type your line and press Enter; **Enter on an empty line**, Esc or **END** finishes the conversation.
 
 ### Getting an API key
 
