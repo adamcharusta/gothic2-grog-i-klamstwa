@@ -39,6 +39,7 @@ struct Scenario {
 struct CastMember {
   std::string id;
   std::string name;
+  std::string instance;  // Gothic script instance, e.g. PIR_1320_ADDON_GREG
 };
 
 struct Cast {
@@ -46,6 +47,7 @@ struct Cast {
   std::vector<CastMember> npcs;
   std::vector<std::string> places;
   std::map<std::string, std::map<std::string, std::string>> placeNames;  // id -> {pl,en}
+  std::map<std::string, std::string> placeWaypoints;                    // id -> engine waypoint
   std::vector<std::string> motives;
 
   std::string displayName(const std::string& npcId) const;

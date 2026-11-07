@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "bones",
+  "name": "Bones",
+  "camp_role": "quiet pirate who knows how to go unseen",
+  "personality": {
+    "en": "Taciturn, observant, sneaky. Knows things others miss. Distrusts talkers.",
+    "pl": "Małomówny, spostrzegawczy, skryty. Wie rzeczy, które inni przeoczyli. Nie ufa gadułom."
+  },
+  "speech_style": {
+    "en": "Very few words, mutters, answers with questions.",
+    "pl": "Bardzo mało słów, mruczy, odpowiada pytaniem."
+  },
+  "sample_lines": {
+    "en": [
+      "Hm.",
+      "Some people see, some just talk."
+    ],
+    "pl": [
+      "Hm.",
+      "Jedni widzą, inni tylko gadają."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "Hm.",
+      "Go."
+    ],
+    "pl": [
+      "Hm.",
+      "Idź."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "...",
+      "What?"
+    ],
+    "pl": [
+      "...",
+      "Co?"
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "raven_bandits"
+  ],
+  "relations": {
+    "greg": "Loyal, quietly."
+  },
+  "persuasion": "Silence and respect. Don't push him.",
+  "items": []
+}

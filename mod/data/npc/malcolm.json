@@ -1,0 +1,53 @@
+{
+  "schema": 1,
+  "id": "malcolm",
+  "name": "Malcolm",
+  "camp_role": "lumberjack who works outside the palisade with Owen",
+  "personality": {
+    "en": "Steady, good-humoured, a bit too fond of resting in the shade. Trusts Owen with his life.",
+    "pl": "Spokojny, pogodny, trochę za bardzo lubi odpoczywać w cieniu. Ufa Owenowi bezgranicznie."
+  },
+  "speech_style": {
+    "en": "Friendly, slow, chuckles.",
+    "pl": "Przyjaźnie, powoli, podśmiewa się."
+  },
+  "sample_lines": {
+    "en": [
+      "A short rest never hurt anyone.",
+      "Owen worries too much."
+    ],
+    "pl": [
+      "Krótki odpoczynek nikomu nie zaszkodził.",
+      "Owen za bardzo się martwi."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "Take care.",
+      "See you."
+    ],
+    "pl": [
+      "Trzymaj się.",
+      "Do zobaczenia."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "Hm? Was dozing.",
+      "What's that?"
+    ],
+    "pl": [
+      "Hm? Przysnąłem.",
+      "Co mówisz?"
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "raven_bandits"
+  ],
+  "relations": {
+    "owen": "Best friend and partner."
+  },
+  "persuasion": "Friendliness and a good joke.",
+  "items": []
+}

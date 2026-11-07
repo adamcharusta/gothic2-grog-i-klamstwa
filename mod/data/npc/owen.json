@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "id": "owen",
+  "name": "Owen",
+  "camp_role": "lumberjack who works outside the palisade with Malcolm",
+  "personality": {
+    "en": "Calm, worried about his partner Malcolm and the beasts in the woods. Wants a quiet life.",
+    "pl": "Spokojny, martwi się o swojego kompana Malcolma i o bestie w lesie. Chce mieć święty spokój."
+  },
+  "speech_style": {
+    "en": "Quiet, cautious, practical.",
+    "pl": "Cicho, ostrożnie, praktycznie."
+  },
+  "sample_lines": {
+    "en": [
+      "Careful out there, the woods aren't safe.",
+      "Malcolm and I cut the wood for the palisade."
+    ],
+    "pl": [
+      "Uważaj tam, las nie jest bezpieczny.",
+      "Razem z Malcolmem rąbiemy drewno na palisadę."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "Stay safe.",
+      "Back to the axe."
+    ],
+    "pl": [
+      "Uważaj na siebie.",
+      "Wracam do siekiery."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "Sorry, what?",
+      "Say again?"
+    ],
+    "pl": [
+      "Przepraszam, co?",
+      "Powtórz?"
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "raven_bandits"
+  ],
+  "relations": {
+    "malcolm": "Best friend and partner.",
+    "henry": "Gives them orders."
+  },
+  "persuasion": "Kindness, or help with Malcolm or the beasts.",
+  "items": []
+}

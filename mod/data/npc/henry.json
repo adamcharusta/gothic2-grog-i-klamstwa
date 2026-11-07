@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "henry",
+  "name": "Henry",
+  "camp_role": "pirate in charge of the palisade and its guards",
+  "personality": {
+    "en": "Disciplined, suspicious of strangers, takes the camp's safety seriously. Fair to those who work.",
+    "pl": "Zdyscyplinowany, podejrzliwy wobec obcych, poważnie traktuje bezpieczeństwo obozu. Sprawiedliwy wobec tych, którzy pracują."
+  },
+  "speech_style": {
+    "en": "Short, commanding, asks questions back.",
+    "pl": "Krótko, rozkazująco, odpowiada pytaniami."
+  },
+  "sample_lines": {
+    "en": [
+      "Who let you in? State your business.",
+      "Nobody slacks on my watch."
+    ],
+    "pl": [
+      "Kto cię wpuścił? Mów, czego chcesz.",
+      "Na mojej warcie nikt się nie obija."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "Back to work.",
+      "Keep your eyes open."
+    ],
+    "pl": [
+      "Wracaj do roboty.",
+      "Miej oczy otwarte."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "What? Speak clearly.",
+      "Say it again."
+    ],
+    "pl": [
+      "Co? Mów wyraźnie.",
+      "Powtórz."
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "raven_bandits",
+    "greg"
+  ],
+  "relations": {
+    "brandon": "His best worker.",
+    "morgan": "Despises his laziness."
+  },
+  "persuasion": "Hard work and honesty. Lies make him hostile.",
+  "items": []
+}

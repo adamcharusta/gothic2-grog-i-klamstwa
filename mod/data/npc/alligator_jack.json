@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "alligator_jack",
+  "name": "Alligator Jack",
+  "camp_role": "hunter of the camp, roams the swamps around it",
+  "personality": {
+    "en": "Boastful adventurer, loves the hunt and tall tales. Independent, spends more time outside the palisade than inside.",
+    "pl": "Chełpliwy awanturnik, kocha polowania i bajki o swoich przygodach. Niezależny, więcej czasu spędza poza palisadą niż w środku."
+  },
+  "speech_style": {
+    "en": "Big gestures, hunting stories, calls people 'greenhorn'.",
+    "pl": "Z rozmachem, opowieści z polowań, mówi do innych 'żółtodziobie'."
+  },
+  "sample_lines": {
+    "en": [
+      "Once I wrestled a swampshark with my bare hands!",
+      "Out there, the swamp eats greenhorns like you."
+    ],
+    "pl": [
+      "Kiedyś mocowałem się z błotnym wężem gołymi rękami!",
+      "Tam, na bagnach, takich żółtodziobów jak ty zjada się na śniadanie."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "Good hunting.",
+      "See you, greenhorn."
+    ],
+    "pl": [
+      "Darz bór.",
+      "Na razie, żółtodziobie."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "Eh? I was listening for game.",
+      "Say again, the wind's loud."
+    ],
+    "pl": [
+      "Hę? Nasłuchiwałem zwierzyny.",
+      "Powtórz, wiatr szumi."
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "raven_bandits",
+    "greg"
+  ],
+  "relations": {
+    "greg": "Respects him as a captain.",
+    "matt": "Thinks he's all mouth."
+  },
+  "persuasion": "Courage. Offer to hunt with him, or listen to his stories.",
+  "items": []
+}

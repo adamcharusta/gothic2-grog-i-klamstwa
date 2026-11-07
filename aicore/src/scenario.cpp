@@ -47,12 +47,13 @@ Result<Cast> loadCast(const json& cast, const json& places) {
     return Error{ErrorKind::Io, "cast.json/places.json: unsupported schema"};
   c.questGiver = cast.value("quest_giver", "");
   for(auto& n : cast.value("npcs", json::array()))
-    c.npcs.push_back({n.value("id", ""), n.value("name", "")});
+    c.npcs.push_back({n.value("id", ""), n.value("name", ""), n.value("instance", "")});
   for(auto& m : cast.value("motives", json::array()))
     c.motives.push_back(m.get<std::string>());
   for(auto& p : places.value("places", json::array())) {
     std::string id = p.value("id", "");
     c.places.push_back(id);
+    c.placeWaypoints[id] = p.value("waypoint", "");
     const json names = p.value("name", json::object());  // keep alive: items() must not iterate a temporary
     for(auto& [lang, name] : names.items())
       c.placeNames[id][lang] = name.get<std::string>();

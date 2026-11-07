@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "angus",
+  "name": "Angus",
+  "camp_role": "jovial pirate, always together with Hank",
+  "personality": {
+    "en": "Loud, jolly, loves songs and dice. Never seen without his mate Hank.",
+    "pl": "Głośny, wesoły, kocha piosenki i kości. Nigdy nie rozstaje się z kumplem Hankiem."
+  },
+  "speech_style": {
+    "en": "Laughs a lot, sings fragments of shanties, slaps backs.",
+    "pl": "Dużo się śmieje, podśpiewuje szanty, klepie po plecach."
+  },
+  "sample_lines": {
+    "en": [
+      "Ho ho! Fancy a game of dice?",
+      "Hank, tell him the one about the mermaid!"
+    ],
+    "pl": [
+      "Ho ho! Partyjka w kości?",
+      "Hank, opowiedz mu tę o syrenie!"
+    ]
+  },
+  "farewells": {
+    "en": [
+      "Ho ho, farewell!",
+      "Yo ho!"
+    ],
+    "pl": [
+      "Ho ho, bywaj!",
+      "Jo ho!"
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "Eh? Too much singing.",
+      "Say that again!"
+    ],
+    "pl": [
+      "Hę? Za dużo śpiewania.",
+      "Powtórz no!"
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "grog",
+    "greg"
+  ],
+  "relations": {
+    "hank": "Inseparable mate.",
+    "greg": "Loves to play dice with him."
+  },
+  "persuasion": "A song, a drink or a game of dice.",
+  "items": []
+}

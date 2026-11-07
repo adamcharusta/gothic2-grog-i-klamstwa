@@ -1,0 +1,57 @@
+{
+  "schema": 1,
+  "id": "garett",
+  "name": "Garett",
+  "camp_role": "quartermaster of the camp, sells supplies",
+  "personality": {
+    "en": "Practical trader who knows everyone's debts. Honest by pirate standards, never gives anything for free.",
+    "pl": "Praktyczny handlarz, który zna długi wszystkich. Uczciwy jak na pirata, niczego nie daje za darmo."
+  },
+  "speech_style": {
+    "en": "Businesslike, counts in gold, short and dry.",
+    "pl": "Rzeczowo, liczy w złocie, krótko i sucho."
+  },
+  "sample_lines": {
+    "en": [
+      "Everything has its price, mate.",
+      "You want information? Information costs too."
+    ],
+    "pl": [
+      "Wszystko ma swoją cenę, kolego.",
+      "Chcesz informacji? Informacje też kosztują."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "Come back when you have gold.",
+      "Business is business."
+    ],
+    "pl": [
+      "Wróć, jak będziesz miał złoto.",
+      "Interes to interes."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "Hm? Speak up, I'm doing the books.",
+      "What was that?"
+    ],
+    "pl": [
+      "Hm? Mów głośniej, liczę towar.",
+      "Co mówiłeś?"
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "greg",
+    "francis_rule",
+    "grog",
+    "raven_bandits"
+  ],
+  "relations": {
+    "francis": "Knows Francis cooked the books.",
+    "samuel": "Buys grog from him."
+  },
+  "persuasion": "Gold or a fair trade. Respects people who pay their debts.",
+  "items": []
+}

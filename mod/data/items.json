@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "note": "Story item id -> Gothic II NotR item instance.",
+  "items": {
+    "greg_tankard": "ITMI_SILVERCUP",
+    "tankard_lookalike": "ITMI_GOLDCUP",
+    "key_reward_chest": "ITKE_GREG_ADDON_MIS",
+    "captain_outfit": "ITAR_PIR_H_ADDON"
+  }
+}
