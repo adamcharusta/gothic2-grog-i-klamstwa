@@ -6,7 +6,8 @@ set -euo pipefail
 die() { echo "error: $2" >&2; exit "$1"; }
 
 mode="${1:-}"
-root="$(git rev-parse --show-toplevel)"
+# Resolve the repo from the script location, not the current directory.
+root="$(git -C "$(dirname "${BASH_SOURCE[0]}")" rev-parse --show-toplevel)"
 [[ -f "$root/VERSION" ]] || die 1 "VERSION file not found in $root"
 version="$(tr -d ' \t\r\n' < "$root/VERSION")"
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || die 1 "invalid VERSION '$version' (expected MAJOR.MINOR.PATCH)"

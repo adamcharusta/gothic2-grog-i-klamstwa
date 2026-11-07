@@ -23,6 +23,11 @@ printf '0.2.0\n' > VERSION
 assert_fail "beta without run number rejected" -- bash "$V" beta
 assert_fail "unknown mode rejected" -- bash "$V" nightly 3
 
+# Run from inside another git repo: must still read this repo's VERSION
+OTHER="$TMP/other repo"; mkdir -p "$OTHER" && git -C "$OTHER" init -q && printf '9.9.9
+' > "$OTHER/VERSION"
+assert_eq "0.2.0" "$(cd "$OTHER" && bash "$V" release)" "VERSION resolved from script location, not cwd"
+
 git tag v0.2.0
 bash "$V" release >/dev/null 2>"$TMP/err"; code=$?
 assert_eq "2" "$code" "existing tag exits 2"

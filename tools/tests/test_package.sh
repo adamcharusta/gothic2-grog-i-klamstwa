@@ -39,6 +39,20 @@ assert_fail "launcher has no bare LF" -- grep -qvU $'\r$' "$STAGE/Start-GrogIKla
 assert_ok "manifest version filled" -- grep -q "^Version=0.1.0-beta.3" "$STAGE/system/GrogIKlamstwa.ini"
 assert_ok "manifest is Windows-1250 (ł = 0xB3)" -- grep -q $'\xb3' "$STAGE/system/GrogIKlamstwa.ini"
 
+# run from inside another git repo (cwd must not matter)
+OTHER="$TMP/other repo"; mkdir -p "$OTHER" && git -C "$OTHER" init -q
+fake_engine
+(cd "$OTHER" && bash "$REPO/tools/package.sh" --version 0.1.0-beta.3 --engine-dir "$TMP/eng ł" --out "$TMP/out2 ł" >/dev/null 2>&1)
+assert_eq "0" "$?" "package works when cwd is another repo"
+
+# unexpected files in the engine dir (original game binaries, build junk) are refused
+for junk in vdfs32g.dll Gothic2.exe a.sav "GrogAI (1).ini" GrogAI.ini.bak; do
+  fake_engine; : > "$TMP/eng ł/$junk"
+  pack >/dev/null 2>"$TMP/err"; assert_eq "4" "$?" "engine dir with '$junk' refused"
+done
+fake_engine; mkdir -p "$TMP/eng ł/data"; : > "$TMP/eng ł/data/x"
+pack >/dev/null 2>&1; assert_eq "4" "$?" "lower-case data/ dir refused"
+
 # missing exe
 fake_engine; rm "$TMP/eng ł/Gothic2Notr.exe"
 pack >/dev/null 2>"$TMP/err"; code=$?
@@ -57,6 +71,9 @@ pack >/dev/null 2>&1; assert_eq "4" "$?" "game archive refused"
 
 fake_engine; cp README.md README.md.bak; echo "key sk-ant-aaaaaaaaaaaaaaaaaaaaaaaa" >> README.md
 pack >/dev/null 2>&1; assert_eq "4" "$?" "API key in text refused"
+mv README.md.bak README.md
+fake_engine; cp README.md README.md.bak; echo "key AIzaSyA1234567890abcdefghijklmnopqrstu" >> README.md
+pack >/dev/null 2>&1; assert_eq "4" "$?" "Gemini key in text refused"
 mv README.md.bak README.md
 
 finish
