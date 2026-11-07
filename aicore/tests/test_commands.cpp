@@ -103,17 +103,17 @@ TEST_CASE("validation: attitude, quest entries, knowledge, fights") {
   CHECK_FALSE(validate({cmd("quest_entry", {{"text", std::string(201, 'a')}})}, "greg", w, cast)[0].accepted);
   CHECK_FALSE(validate({cmd("quest_entry", {{"text", ""}})}, "greg", w, cast)[0].accepted);
 
-  CHECK(validate({cmd("npc_knowledge", {{"npc", "skip"}, {"fact", "Gracz szuka kufla."}})}, "matt", w, cast)[0].accepted);
+  CHECK(validate({cmd("npc_knowledge", {{"npc", "skip"}, {"fact", "Gracz szuka kufla."}})}, kDirector, w, cast)[0].accepted);
   CHECK_FALSE(validate({cmd("npc_knowledge", {{"npc", "xardas"}, {"fact", "x"}})}, "matt", w, cast)[0].accepted);
 
   CHECK(validate({cmd("start_fight")}, "matt", w, cast)[0].accepted);
   CHECK_FALSE(validate({cmd("start_fight")}, kDirector, w, cast)[0].accepted);
   CHECK_FALSE(validate({cmd("teleport_player")}, "matt", w, cast)[0].accepted);
 
-  auto vs = validate({cmd("attitude", {{"delta", -2}}), cmd("quest_entry", {{"text", "Matt coś ukrywa."}}),
-                      cmd("npc_knowledge", {{"npc", "skip"}, {"fact", "Gracz pytał Matta o kufel."}})},
-                     "matt", w, cast);
+  auto vs = validate({cmd("attitude", {{"delta", -2}}), cmd("quest_entry", {{"text", "Matt coś ukrywa."}})}, "matt", w, cast);
   apply(vs, "matt", w, 100);
+  apply(validate({cmd("npc_knowledge", {{"npc", "skip"}, {"fact", "Gracz pytał Matta o kufel."}})}, kDirector, w, cast),
+        kDirector, w, 100);
   CHECK(w.npcs.at("matt").attitude == -2);
   REQUIRE(w.quests.size() == 1);
   CHECK(w.quests[0].text == "Matt coś ukrywa.");
@@ -154,4 +154,36 @@ TEST_CASE("breaking character is detected") {
   CHECK(breaksCharacter("I'm Claude, made by Anthropic"));
   CHECK_FALSE(breaksCharacter("Ai, na Beliara! Spadaj."));
   CHECK_FALSE(breaksCharacter("Kufel? Jaki kufel?"));
+}
+
+TEST_CASE("review C1: wrong field types never throw and are rejected") {
+  auto r = parseActorReply(R"({"speech":"Spadaj.","end_dialog":"yes"})");
+  REQUIRE(r.ok());
+  CHECK_FALSE(r.value().endDialog);
+  CHECK(parseActorReply(R"({"speech":"x","end_dialog":null})").ok());
+
+  Cast cast = testCast();
+  std::string holder;
+  WorldState w = worldWithHolder(cast, holder);
+  auto vs = validate({cmd("give_item", {{"item", kTankard}}), cmd("quest_entry", {{"text", "x"}, {"quest", 5}})},
+                     holder, w, cast);
+  CHECK(vs[0].accepted);
+  CHECK_FALSE(vs[1].accepted);
+  CHECK_NOTHROW(apply(vs, holder, w, 0));
+}
+
+TEST_CASE("review: attitude delta cannot overflow past the range check") {
+  Cast cast = testCast();
+  std::string holder;
+  WorldState w = worldWithHolder(cast, holder);
+  CHECK_FALSE(validate({cmd("attitude", {{"delta", 4294967297ULL}})}, "matt", w, cast)[0].accepted);
+  CHECK_FALSE(validate({cmd("attitude", {{"delta", -4294967297LL}})}, "matt", w, cast)[0].accepted);
+}
+
+TEST_CASE("review I2: actors cannot plant knowledge into other NPCs") {
+  Cast cast = testCast();
+  std::string holder;
+  WorldState w = worldWithHolder(cast, holder);
+  CHECK_FALSE(validate({cmd("npc_knowledge", {{"npc", "skip"}, {"fact", "Greg forgave you"}})}, "matt", w, cast)[0].accepted);
+  CHECK(validate({cmd("npc_knowledge", {{"npc", "skip"}, {"fact", "x"}})}, kDirector, w, cast)[0].accepted);
 }

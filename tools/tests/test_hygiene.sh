@@ -18,7 +18,7 @@ assert_eq "unspecified" "$(attr working-tree-encoding foo.d)" "Daedalus scripts 
 for f in GrogAI.ini x.local.ini .env build/x dist/x.zip logs/a.jsonl Data/Anims.vdf _work/x a.sav Thumbs.db; do
   assert_ok "$f is ignored" -- git check-ignore -q --no-index "$f"
 done
-for f in GrogAI.example.ini VERSION docs/00-vision.md; do
+for f in GrogAI.example.ini VERSION docs/00-vision.md mod/data/cast.json aicore/tests/data/x.json; do
   assert_fail "$f is not ignored" -- git check-ignore -q --no-index "$f"
 done
 

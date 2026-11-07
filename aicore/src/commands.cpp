@@ -106,13 +106,14 @@ Result<ActorReply> parseActorReply(std::string_view modelText) {
     return Error{ErrorKind::BadResponse, "reply has no 'speech'"};
   ActorReply r;
   r.speech = utf8Truncate(o["speech"].get<std::string>(), kMaxSpeechChars);
-  if(o.contains("gesture") && o["gesture"].is_string())
+  static const std::set<std::string> kGestures = {"neutral", "angry", "laugh", "think", "shrug", "threaten", "drink"};
+  if(o.contains("gesture") && o["gesture"].is_string() && kGestures.count(o["gesture"].get<std::string>()))
     r.gesture = o["gesture"].get<std::string>();
   auto acts = readActions(o, false);
   if(!acts.ok())
     return acts.error();
   r.actions = std::move(acts.value());
-  r.endDialog = o.value("end_dialog", false) == true;
+  r.endDialog = o.contains("end_dialog") && o["end_dialog"].is_boolean() && o["end_dialog"].get<bool>();
   return r;
 }
 
@@ -150,13 +151,16 @@ std::vector<Verdict> validate(const std::vector<Command>& commands, std::string_
         reject("only an NPC can change its own attitude");
       else if(!a.contains("delta") || !a["delta"].is_number_integer())
         reject("delta must be an integer");
-      else if(int d = a["delta"].get<int>(); d < -2 || d > 2)
+      else if(a["delta"].is_number_unsigned() ? a["delta"].get<uint64_t>() > 2
+                                               : (a["delta"].get<int64_t>() < -2 || a["delta"].get<int64_t>() > 2))
         reject("delta out of range -2..2");
       else
         v.accepted = true;
     } else if(c.type == "quest_entry" || c.type == "quest_new") {
       std::string t = str(a, "text");
-      if(t.empty())
+      if(a.contains("quest") && !a["quest"].is_string())
+        reject("quest must be a string");
+      else if(t.empty())
         reject("empty text");
       else if(utf8Length(t) > kMaxQuestChars)
         reject("text too long");
@@ -180,7 +184,9 @@ std::vector<Verdict> validate(const std::vector<Command>& commands, std::string_
         v.accepted = true;
     } else if(c.type == "npc_knowledge") {
       std::string fact = str(a, "fact");
-      if(!knownNpc(str(a, "npc")))
+      if(!isDirector)
+        reject("only the director changes what other NPCs know");
+      else if(!knownNpc(str(a, "npc")))
         reject("unknown npc");
       else if(fact.empty() || utf8Length(fact) > 300)
         reject("fact must be 1-300 characters");
@@ -251,15 +257,16 @@ void apply(const std::vector<Verdict>& verdicts, std::string_view speaker, World
     const std::string& t = v.command.type;
     if(t == "attitude") {
       int& att = w.npcs[who].attitude;
-      att = std::clamp(att + a["delta"].get<int>(), -5, 5);
+      att = static_cast<int>(std::clamp<int64_t>(att + a["delta"].get<int64_t>(), -5, 5));
     } else if(t == "quest_entry" || t == "quest_new") {
-      w.quests.push_back({a.value("quest", std::string("tankard")), a["text"].get<std::string>(), gameTimeS});
+      std::string q = str(a, "quest");
+      w.quests.push_back({q.empty() ? std::string("tankard") : q, str(a, "text"), gameTimeS});
     } else if(t == "give_item") {
-      w.itemHolder[a["item"].get<std::string>()] = "player";
+      w.itemHolder[str(a, "item")] = "player";
     } else if(t == "npc_knowledge") {
-      w.npcs[a["npc"].get<std::string>()].knows.push_back(a["fact"].get<std::string>());
+      w.npcs[str(a, "npc")].knows.push_back(str(a, "fact"));
     } else if(t == "spawn_monster") {
-      w.activeMonster = a["monster"].get<std::string>();
+      w.activeMonster = str(a, "monster");
     }
     if(kEventTypes.count(t))
       ++w.eventsThisHour;

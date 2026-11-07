@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "id": "greg",
+  "name": "Greg",
+  "camp_role": "captain of the pirates, just back in the camp after a long absence",
+  "personality": {
+    "en": "Hard, loud, short-tempered captain with an eye patch. Respects strength and results, despises excuses and slackers. Generous with grog when pleased, merciless when crossed. His favourite tankard has gone missing and he is furious about it.",
+    "pl": "Twardy, głośny i porywczy kapitan z opaską na oku. Szanuje siłę i wyniki, gardzi wymówkami i obibokami. Hojny w grogu, gdy jest zadowolony, bezlitosny, gdy ktoś go zawiedzie. Zginął jego ulubiony kufel i jest o to wściekły."
+  },
+  "speech_style": {
+    "en": "Barked orders, short sentences, sailor curses, calls the player 'boy' or 'landlubber'. Never polite.",
+    "pl": "Wykrzykiwane rozkazy, krótkie zdania, marynarskie przekleństwa, mówi do gracza 'chłopcze' albo 'szczurze lądowy'. Nigdy uprzejmy."
+  },
+  "sample_lines": {
+    "en": ["Don't stand there gawping, boy. Find my tankard!", "Who's been drinking from MY tankard? I'll have his hide!"],
+    "pl": ["Nie stój tak z otwartą gębą, chłopcze. Znajdź mój kufel!", "Kto pił z MOJEGO kufla? Obedrę go ze skóry!"]
+  },
+  "farewells": {
+    "en": ["Get moving!", "And don't come back empty-handed."],
+    "pl": ["Ruszaj się!", "I nie wracaj z pustymi rękami."]
+  },
+  "fallback_lines": {
+    "en": ["Argh, my head... Say that again.", "Too much grog last night. What?"],
+    "pl": ["Argh, ten łeb... Powtórz.", "Za dużo grogu wczoraj. Co mówisz?"]
+  },
+  "knows_about": ["camp", "greg", "ship", "raven_bandits", "francis_rule", "grog"],
+  "relations": {
+    "francis": "Left him in charge; suspects he lined his own pockets.",
+    "skip": "Loyal but clumsy; trusts him with chores.",
+    "samuel": "Values his grog more than most men."
+  },
+  "persuasion": "Only results and loyalty impress him. Flattery makes him angrier.",
+  "items": ["key_reward_chest"]
+}

@@ -48,7 +48,11 @@ struct DirectorResult {
   std::optional<Error> error;
 };
 
-// One playthrough. Calls are serialised internally; talkAsync runs talk() on a worker thread.
+// One playthrough.
+// Threading: the world is locked only while a prompt is built and while a reply is applied, never during the
+// provider call, so farewell()/worldSnapshot() stay responsive while a talk is in flight.
+// Lifetime: the session (and the providers/telemetry it references) must outlive every future from talkAsync;
+// wait for pending futures before destroying it. Keep the returned future: discarding it blocks until done.
 class GameSession {
  public:
   GameSession(AiConfig config, GameData data, ILlmProvider& actor, ILlmProvider& director, Telemetry& telemetry,
@@ -59,6 +63,9 @@ class GameSession {
   DirectorResult direct(std::string_view trigger, int64_t gameTimeS);
   std::string farewell(std::string_view npc);
 
+  // Locked copy, safe from any thread.
+  WorldState worldSnapshot();
+  // Direct access: only when no talk/direct call is in flight (tests, single-threaded tools).
   WorldState& world() { return world_; }
   const GameData& data() const { return data_; }
   const AiConfig& config() const { return config_; }

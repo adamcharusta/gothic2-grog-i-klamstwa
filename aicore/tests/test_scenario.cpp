@@ -6,6 +6,14 @@
 
 #include <set>
 
+// Golden scenario for seed 2026 (recorded on MSVC; CI checks the same values on gcc).
+// If the generator changes on purpose, update these and note it: old seeds give new scenarios.
+#define GOLDEN_TYPE "stolen"
+#define GOLDEN_CULPRIT "skip"
+#define GOLDEN_LOCATION "skip"
+#define GOLDEN_CLUES 9u
+#define GOLDEN_LAST_FACT "{matt} heard a rumour (untrue) that {owen} has been drinking from a fancy new tankard."
+
 using namespace grog::ai;
 using nlohmann::json;
 
@@ -96,4 +104,20 @@ TEST_CASE("scenario round-trips through JSON") {
   auto back = scenarioFromJson(toJson(s));
   REQUIRE(back.ok());
   CHECK(toJson(back.value()).dump() == toJson(s).dump());
+}
+
+TEST_CASE("review I1: liar story and graph agree; golden scenario pins cross-compiler determinism") {
+  Cast cast = loadTestCast();
+  for(uint64_t seed = 1; seed <= 200; ++seed) {
+    Scenario s = rollScenario(seed, cast);
+    for(auto& c : s.clues)
+      if(!c.truthful)
+        CHECK(c.fact.find("{" + c.pointsTo[0] + "}") != std::string::npos);
+  }
+  Scenario g = rollScenario(2026, cast);
+  CHECK(std::string(scenarioTypeName(g.type)) == GOLDEN_TYPE);
+  CHECK(g.culprit == GOLDEN_CULPRIT);
+  CHECK(g.tankardLocation == GOLDEN_LOCATION);
+  CHECK(g.clues.size() == GOLDEN_CLUES);
+  CHECK(g.clues.back().fact == GOLDEN_LAST_FACT);
 }

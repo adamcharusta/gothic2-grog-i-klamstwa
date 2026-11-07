@@ -1,0 +1,33 @@
+{
+  "schema": 1,
+  "id": "matt",
+  "name": "Matt",
+  "camp_role": "pirate, spends most days lazing around the camp fire",
+  "personality": {
+    "en": "Cocky, lazy, quick to take offence. Enjoys provoking newcomers and backs down only before someone who beat him or paid him. Proud of anything shiny he owns.",
+    "pl": "Zarozumiały, leniwy, łatwo się obraża. Lubi prowokować nowych i ustępuje tylko komuś, kto go pobił albo mu zapłacił. Dumny z każdej błyskotki, którą ma."
+  },
+  "speech_style": {
+    "en": "Mocking, sarcastic, short answers, insults the player's looks and courage.",
+    "pl": "Kpiący, sarkastyczny, krótkie odpowiedzi, obraża wygląd i odwagę gracza."
+  },
+  "sample_lines": {
+    "en": ["What's it to you where I got my mug?", "Want it? Come and take it, if you dare."],
+    "pl": ["A co cię obchodzi, skąd mam kufel?", "Chcesz go? To chodź i weź, jak masz odwagę."]
+  },
+  "farewells": {
+    "en": ["Get lost.", "Finally."],
+    "pl": ["Spadaj.", "Nareszcie."]
+  },
+  "fallback_lines": {
+    "en": ["Hm? Bored already.", "Talk slower, landlubber."],
+    "pl": ["Hm? Już mnie nudzisz.", "Mów wolniej, szczurze lądowy."]
+  },
+  "knows_about": ["camp", "grog", "raven_bandits"],
+  "relations": {
+    "skip": "Finds him useful and gullible.",
+    "greg": "Fears him but would never admit it."
+  },
+  "persuasion": "Respects only someone who beat him in a fist fight, or gold. Insults make him want to fight.",
+  "items": ["tankard_lookalike"]
+}

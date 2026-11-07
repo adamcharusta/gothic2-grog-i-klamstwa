@@ -8,6 +8,15 @@ namespace {
 using nlohmann::json;
 using Clock = std::chrono::steady_clock;
 
+// Model/game text may contain invalid UTF-8 (e.g. cp1250 from the engine): never throw while serialising.
+std::string dumpSafe(const json& j) { return j.dump(-1, ' ', false, json::error_handler_t::replace); }
+
+int intAt(const json& j, const char* a, const char* b) {
+  if(j.is_object() && j.contains(a) && j[a].is_object() && j[a].contains(b) && j[a][b].is_number_integer())
+    return j[a][b].get<int>();
+  return 0;
+}
+
 double msSince(Clock::time_point t0) {
   return std::chrono::duration<double, std::milli>(Clock::now() - t0).count();
 }
@@ -43,7 +52,7 @@ class AnthropicProvider : public ILlmProvider {
                  {"messages", chatMessages(req)}};
     HttpRequest hr{cfg_.baseUrl + "/v1/messages",
                    {{"x-api-key", cfg_.apiKey}, {"anthropic-version", "2023-06-01"}, {"content-type", "application/json"}},
-                   body.dump(),
+                   dumpSafe(body),
                    cfg_.timeoutS};
     auto t0 = Clock::now();
     auto res = http_.post(hr);
@@ -56,13 +65,13 @@ class AnthropicProvider : public ILlmProvider {
       return Error{ErrorKind::BadResponse, "anthropic: unexpected reply format"};
     LlmReply out;
     for(auto& c : j["content"])
-      if(c.value("type", "") == "text")
-        out.text += c.value("text", "");
+      if(c.is_object() && c.contains("type") && c["type"] == "text" && c.contains("text") && c["text"].is_string())
+        out.text += c["text"].get<std::string>();
     if(out.text.empty())
       return Error{ErrorKind::BadResponse, "anthropic: empty reply"};
-    out.inputTokens = j.value("/usage/input_tokens"_json_pointer, 0);
-    out.outputTokens = j.value("/usage/output_tokens"_json_pointer, 0);
-    out.model = j.value("model", cfg_.model);
+    out.inputTokens = intAt(j, "usage", "input_tokens");
+    out.outputTokens = intAt(j, "usage", "output_tokens");
+    out.model = j.contains("model") && j["model"].is_string() ? j["model"].get<std::string>() : cfg_.model;
     out.latencyMs = msSince(t0);
     return out;
   }
@@ -88,7 +97,7 @@ class OpenAiCompatibleProvider : public ILlmProvider {
                  {"max_tokens", req.maxTokens},
                  {"messages", msgs},
                  {"response_format", {{"type", "json_object"}}}};
-    HttpRequest hr{cfg_.baseUrl + "/chat/completions", {{"content-type", "application/json"}}, body.dump(),
+    HttpRequest hr{cfg_.baseUrl + "/chat/completions", {{"content-type", "application/json"}}, dumpSafe(body),
                    cfg_.timeoutS};
     if(!cfg_.apiKey.empty())
       hr.headers.push_back({"Authorization", "Bearer " + cfg_.apiKey});
@@ -101,14 +110,17 @@ class OpenAiCompatibleProvider : public ILlmProvider {
     json j = json::parse(res.value().body, nullptr, false);
     if(j.is_discarded() || !j.contains("choices") || !j["choices"].is_array() || j["choices"].empty())
       return Error{ErrorKind::BadResponse, "openai_compatible: unexpected reply format"};
-    auto content = j["choices"][0].value("/message/content"_json_pointer, json());
+    const json& ch = j["choices"][0];
+    json content = ch.is_object() && ch.contains("message") && ch["message"].is_object() && ch["message"].contains("content")
+                       ? ch["message"]["content"]
+                       : json();
     if(!content.is_string() || content.get<std::string>().empty())
       return Error{ErrorKind::BadResponse, "openai_compatible: empty reply"};
     LlmReply out;
     out.text = content.get<std::string>();
-    out.inputTokens = j.value("/usage/prompt_tokens"_json_pointer, 0);
-    out.outputTokens = j.value("/usage/completion_tokens"_json_pointer, 0);
-    out.model = j.value("model", cfg_.model);
+    out.inputTokens = intAt(j, "usage", "prompt_tokens");
+    out.outputTokens = intAt(j, "usage", "completion_tokens");
+    out.model = j.contains("model") && j["model"].is_string() ? j["model"].get<std::string>() : cfg_.model;
     out.latencyMs = msSince(t0);
     return out;
   }

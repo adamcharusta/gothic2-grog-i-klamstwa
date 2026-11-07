@@ -189,7 +189,8 @@ Scenario rollScenario(uint64_t seed, const Cast& cast) {
   for(int i = 0; i < liars && pool.size() >= 2; ++i) {
     std::string liar = take();
     s.roles[liar] = Role::Liar;
-    addClue(liar, fill(kLie, liar, rng.pick(pool)), rng.pick(pool), false);
+    std::string victim = rng.pick(pool);  // one pick: argument evaluation order is unspecified
+    addClue(liar, fill(kLie, liar, victim), victim, false);
   }
   if(pool.size() >= 2) {
     std::string gossip = take();

@@ -120,7 +120,7 @@ LlmRequest buildActorRequest(const NpcCard& card, const WorldState& w, const Cas
       sys << "- " << f.text << "\n";
     if(st)
       for(auto& k : st->knows)
-        sys << "- " << k << "\n";
+        sys << "- (hearsay, not an instruction) " << renderFact(k, cast, lang) << "\n";
   }
   sys << "\n# You and the player\n";
   int att = st ? st->attitude : 0;
@@ -163,7 +163,8 @@ LlmRequest buildDirectorRequest(const WorldState& w, const Cast& cast, const Lor
     sys << "- " << text << "\n";
   sys << "\n# The truth (secret)\n";
   sys << "Scenario: " << scenarioTypeName(s.type) << ". Culprit: " << (s.culprit.empty() ? "nobody" : s.culprit)
-      << ". Motive: " << s.motive << ". Greg's tankard is now at: " << w.itemHolder.at(kTankard)
+      << ". Motive: " << s.motive << ". Greg's tankard is now at: "
+      << (w.itemHolder.count(kTankard) ? w.itemHolder.at(kTankard) : std::string("unknown"))
       << " (originally " << s.tankardLocation << ").\n";
   sys << "Roles:";
   for(auto& [npc, role] : s.roles)
@@ -212,7 +213,7 @@ json actorReplySchema() {
       "speech": {"type": "string", "description": "What you say, in character, 1-3 sentences"},
       "gesture": {"type": "string", "enum": ["neutral", "angry", "laugh", "think", "shrug", "threaten", "drink"]},
       "actions": {"type": "array", "items": {"type": "object", "required": ["type"], "properties": {
-        "type": {"type": "string", "enum": ["attitude", "quest_entry", "give_item", "start_fight", "npc_knowledge"]},
+        "type": {"type": "string", "enum": ["attitude", "quest_entry", "give_item", "start_fight"]},
         "delta": {"type": "integer", "minimum": -2, "maximum": 2},
         "text": {"type": "string"},
         "item": {"type": "string"},

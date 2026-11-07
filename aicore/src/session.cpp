@@ -105,26 +105,36 @@ GameSession::GameSession(AiConfig config, GameData data, ILlmProvider& actor, IL
   telemetry_.session(world_.scenario, config_);
 }
 
+// Caller holds mu_.
 std::string GameSession::fallbackLine(const NpcCard& card) {
   auto& lines = card.fallbackLines.at(config_.language);
   return rng_.pick(lines);
 }
 
-TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLine, int64_t gameTimeS) {
+WorldState GameSession::worldSnapshot() {
   std::lock_guard<std::mutex> lock(mu_);
+  return world_;
+}
+
+TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLine, int64_t gameTimeS) {
   std::string npc(npcView);
   TurnResult out;
-  auto it = data_.cards.find(npc);
-  if(it == data_.cards.end()) {
-    out.error = Error{ErrorKind::Validation, "no character card for '" + npc + "'"};
-    out.usedFallback = true;
-    out.speech = "...";
-    return out;
+  LlmRequest req;
+  const NpcCard* card = nullptr;
+  {
+    std::lock_guard<std::mutex> lock(mu_);
+    auto it = data_.cards.find(npc);
+    if(it == data_.cards.end()) {
+      out.error = Error{ErrorKind::Validation, "no character card for '" + npc + "'"};
+      out.usedFallback = true;
+      out.speech = "...";
+      return out;
+    }
+    card = &it->second;  // data_ is never modified after construction
+    req = buildActorRequest(*card, world_, data_.cast, data_.lore, config_.language, playerLine, data_.actorRules);
   }
-  const NpcCard& card = it->second;
-  LlmRequest req = buildActorRequest(card, world_, data_.cast, data_.lore, config_.language, playerLine,
-                                     data_.actorRules);
 
+  // Provider call without holding the lock.
   std::optional<ActorReply> reply;
   for(int attempt = 0; attempt < 2 && !reply; ++attempt) {
     auto res = actor_.complete(req);
@@ -146,26 +156,34 @@ TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLi
     out.error.reset();
   }
 
-  if(!reply) {
-    out.usedFallback = true;
-    out.speech = fallbackLine(card);
-    out.gesture = "think";
-    telemetry_.event("fallback", {{"npc", npc}, {"reason", out.error ? errorKindName(out.error->kind) : "unknown"}});
-    return out;
+  std::lock_guard<std::mutex> lock(mu_);
+  if(reply) {
+    try {
+      // Validate the whole batch, apply it to a copy, then commit: all or nothing.
+      auto verdicts = validate(reply->actions, npc, world_, data_.cast);
+      WorldState next = world_;
+      apply(verdicts, npc, next, gameTimeS);
+      auto& mem = next.npcs[npc].memory;
+      mem.push_back({ChatMessage::User, std::string(playerLine)});
+      mem.push_back({ChatMessage::Assistant, reply->speech});
+      while(mem.size() > kMaxMemory)
+        mem.pop_front();
+      world_ = std::move(next);
+      out.speech = reply->speech;
+      out.gesture = reply->gesture;
+      out.endDialog = reply->endDialog;
+      out.verdicts = std::move(verdicts);
+      telemetry_.verdicts(npc, out.verdicts);
+      return out;
+    } catch(const std::exception& e) {
+      out.error = Error{ErrorKind::BadResponse, std::string("reply could not be applied: ") + e.what()};
+      out.verdicts.clear();
+    }
   }
-
-  out.speech = reply->speech;
-  out.gesture = reply->gesture;
-  out.endDialog = reply->endDialog;
-  out.verdicts = validate(reply->actions, npc, world_, data_.cast);
-  apply(out.verdicts, npc, world_, gameTimeS);
-  telemetry_.verdicts(npc, out.verdicts);
-
-  auto& mem = world_.npcs[npc].memory;
-  mem.push_back({ChatMessage::User, std::string(playerLine)});
-  mem.push_back({ChatMessage::Assistant, out.speech});
-  while(mem.size() > kMaxMemory)
-    mem.pop_front();
+  out.usedFallback = true;
+  out.speech = fallbackLine(*card);
+  out.gesture = "think";
+  telemetry_.event("fallback", {{"npc", npc}, {"reason", out.error ? errorKindName(out.error->kind) : "unknown"}});
   return out;
 }
 
@@ -176,9 +194,12 @@ std::future<TurnResult> GameSession::talkAsync(std::string npc, std::string play
 }
 
 DirectorResult GameSession::direct(std::string_view trigger, int64_t gameTimeS) {
-  std::lock_guard<std::mutex> lock(mu_);
   DirectorResult out;
-  LlmRequest req = buildDirectorRequest(world_, data_.cast, data_.lore, trigger, data_.directorRules);
+  LlmRequest req;
+  {
+    std::lock_guard<std::mutex> lock(mu_);
+    req = buildDirectorRequest(world_, data_.cast, data_.lore, trigger, data_.directorRules);
+  }
   auto res = director_.complete(req);
   telemetry_.request("director", "", director_.id(), res, trigger);
   if(!res.ok()) {
@@ -190,10 +211,19 @@ DirectorResult GameSession::direct(std::string_view trigger, int64_t gameTimeS) 
     out.error = parsed.error();
     return out;
   }
-  out.thought = parsed.value().thought;
-  out.verdicts = validate(parsed.value().actions, kDirector, world_, data_.cast);
-  apply(out.verdicts, kDirector, world_, gameTimeS);
-  telemetry_.verdicts(kDirector, out.verdicts);
+  std::lock_guard<std::mutex> lock(mu_);
+  try {
+    out.thought = parsed.value().thought;
+    auto verdicts = validate(parsed.value().actions, kDirector, world_, data_.cast);
+    WorldState next = world_;
+    apply(verdicts, kDirector, next, gameTimeS);
+    world_ = std::move(next);
+    out.verdicts = std::move(verdicts);
+    telemetry_.verdicts(kDirector, out.verdicts);
+  } catch(const std::exception& e) {
+    out.verdicts.clear();
+    out.error = Error{ErrorKind::BadResponse, std::string("director reply could not be applied: ") + e.what()};
+  }
   return out;
 }
 

@@ -1,0 +1,5 @@
+{
+  "schema": 1,
+  "note": "USD per million tokens, used only for the cost estimate in benchmark logs. Fill in from your provider's current price list; unknown models are logged with price_unknown=true and cost 0. Token counts are always logged.",
+  "models": {}
+}

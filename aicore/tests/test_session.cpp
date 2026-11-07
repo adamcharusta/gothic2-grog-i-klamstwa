@@ -145,3 +145,46 @@ TEST_CASE("telemetry log has session and request lines") {
   CHECK(log.find("\"kind\":\"session\"") != std::string::npos);
   CHECK(log.find("\"kind\":\"request\"") != std::string::npos);
 }
+
+TEST_CASE("review C1: malformed field types fall back instead of throwing; batch is atomic") {
+  Fixture f;
+  f.actor.scripted = {R"({"speech":"Masz.","actions":[{"type":"attitude","delta":1},{"type":"quest_entry","text":"x","quest":{"a":1}}],"end_dialog":[1]})"};
+  TurnResult r;
+  CHECK_NOTHROW(r = f.session->talk("greg", "Ahoj", 0));
+  CHECK(r.speech == "Masz.");
+}
+
+TEST_CASE("review I5: invalid UTF-8 from the game does not throw") {
+  Fixture f;
+  std::string cp1250 = std::string("Gdzie jest kufel? ") + char(0xB3);  // cp1250 letter: invalid UTF-8
+  TurnResult r;
+  CHECK_NOTHROW(r = f.session->talk("greg", cp1250, 0));
+  CHECK(f.actor.requests.size() == 1);
+}
+
+TEST_CASE("review I3/I4: the session lock is not held during the provider call") {
+  struct SlowProvider : ILlmProvider {
+    GameSession* s = nullptr;
+    bool farewellWhileWaiting = false;
+    Result<LlmReply> complete(const LlmRequest&) override {
+      // Re-entering the session from inside the call would deadlock if the lock were held.
+      farewellWhileWaiting = !s->farewell("matt").empty();
+      LlmReply r;
+      r.text = R"({"speech":"No."})";
+      return r;
+    }
+    std::string_view id() const override { return "slow"; }
+    std::string_view model() const override { return "slow"; }
+  } slow;
+  MockProvider dir;
+  std::ostringstream log;
+  Telemetry tel(log, false, Pricing{});
+  auto data = loadGameData(pathFromUtf8(std::string(GROG_REPO_ROOT) + "/mod/data"));
+  AiConfig cfg;
+  GameSession s(cfg, data.value(), slow, dir, tel, 1);
+  slow.s = &s;
+  auto r = s.talkAsync("greg", "Ahoj", 0).get();
+  CHECK(slow.farewellWhileWaiting);
+  CHECK(r.speech == "No.");
+  CHECK(s.worldSnapshot().npcs.at("greg").memory.size() == 2);
+}

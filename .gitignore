@@ -31,10 +31,10 @@ GrogAI.ini
 *.local.ini
 .env
 
-# Original Gothic game files - never commit
-Data/
-_work/
-Saves/
+# Original Gothic game files - never commit (anchored: core.ignorecase would also match mod/data/)
+/Data/
+/_work/
+/Saves/
 *.vdf
 *.mod
 

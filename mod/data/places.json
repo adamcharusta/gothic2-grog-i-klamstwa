@@ -1,0 +1,13 @@
+{
+  "schema": 1,
+  "places": [
+    {"id": "greg_hut", "name": {"pl": "chata Grega", "en": "Greg's hut"}},
+    {"id": "campfire", "name": {"pl": "ognisko w obozie", "en": "the camp fire"}},
+    {"id": "dish_tub", "name": {"pl": "balia z naczyniami", "en": "the dish tub"}},
+    {"id": "beach", "name": {"pl": "plaża przy obozie", "en": "the beach by the camp"}},
+    {"id": "palisade_gate", "name": {"pl": "brama w palisadzie", "en": "the palisade gate"}},
+    {"id": "samuel_still", "name": {"pl": "bimbrownia Samuela", "en": "Samuel's still"}},
+    {"id": "storage", "name": {"pl": "skład Garetta", "en": "Garett's storage"}},
+    {"id": "lookout", "name": {"pl": "punkt obserwacyjny", "en": "the lookout"}}
+  ]
+}
