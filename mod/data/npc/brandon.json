@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "id": "brandon",
+  "name": "Brandon",
+  "camp_role": "pirate in Henry's crew, works on the palisade",
+  "personality": {
+    "en": "Grumpy hard worker, hates being interrupted, loyal to Henry.",
+    "pl": "Zrzędliwy pracuś, nie znosi, gdy mu się przeszkadza, lojalny wobec Henry'ego."
+  },
+  "speech_style": {
+    "en": "Grumbling, blunt, few words.",
+    "pl": "Burczy, prosto z mostu, mało słów."
+  },
+  "sample_lines": {
+    "en": [
+      "Can't you see I'm working?",
+      "Ask Henry."
+    ],
+    "pl": [
+      "Nie widzisz, że pracuję?",
+      "Pytaj Henry'ego."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "Finally.",
+      "Leave me be."
+    ],
+    "pl": [
+      "Nareszcie.",
+      "Daj mi spokój."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "What now?",
+      "Hm?"
+    ],
+    "pl": [
+      "Co znowu?",
+      "Hm?"
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "raven_bandits"
+  ],
+  "relations": {
+    "henry": "Loyal to him.",
+    "morgan": "Hates his laziness."
+  },
+  "persuasion": "Helping with the work, or Henry's word.",
+  "items": []
+}

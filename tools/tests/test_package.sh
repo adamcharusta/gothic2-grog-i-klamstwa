@@ -5,7 +5,7 @@ ROOT="$(git rev-parse --show-toplevel)"
 TMP="$(mktemp -d)"; trap 'rm -rf "$TMP"' EXIT
 REPO="$TMP/repo z ł – test"
 mkdir -p "$REPO"
-for p in tools packaging README.md README.pl.md GrogAI.example.ini LICENSE VERSION; do
+for p in tools packaging mod README.md README.pl.md GrogAI.example.ini LICENSE VERSION; do
   [[ -e "$ROOT/$p" ]] && cp -r "$ROOT/$p" "$REPO/"
 done
 mkdir -p "$REPO/engine" && echo "MIT License (fake engine licence)" > "$REPO/engine/LICENSE"
@@ -28,7 +28,8 @@ list="$(unzip -l "$ZIP" 2>/dev/null)"
 D="GrogIKlamstwa-0.1.0-beta.3-win64"
 for p in bin/Gothic2Notr.exe bin/libstdc++-6.dll system/GrogIKlamstwa.ini Start-GrogIKlamstwa.bat \
          GrogAI.example.ini VERSION README.md README.pl.md \
-         LICENSES/LICENSE LICENSES/OpenGothic-LICENSE LICENSES/THIRD_PARTY.md; do
+         LICENSES/LICENSE LICENSES/OpenGothic-LICENSE LICENSES/THIRD_PARTY.md \
+         mod/data/cast.json mod/data/npc/greg.json mod/data/rules/actor.md; do
   assert_contains "$list" "$D/$p" "zip contains $p"
 done
 STAGE="$TMP/out ł/$D"
@@ -38,6 +39,7 @@ assert_eq "0.1.0-beta.3" "$(tr -d '\r\n' < "$STAGE/VERSION")" "VERSION inside pa
 # -U: MSYS grep strips CR in text mode
 assert_ok "launcher has CRLF" -- grep -qU $'\r$' "$STAGE/Start-GrogIKlamstwa.bat"
 assert_fail "launcher has no bare LF" -- grep -qvU $'\r$' "$STAGE/Start-GrogIKlamstwa.bat"
+assert_ok "manifest starts in Jarkendar" -- grep -q "^WORLD=ADDONWORLD.ZEN" "$STAGE/system/GrogIKlamstwa.ini"
 assert_ok "manifest version filled" -- grep -q "^Version=0.1.0-beta.3" "$STAGE/system/GrogIKlamstwa.ini"
 assert_ok "manifest is Windows-1250 (ł = 0xB3)" -- grep -q $'\xb3' "$STAGE/system/GrogIKlamstwa.ini"
 

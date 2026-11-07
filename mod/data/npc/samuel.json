@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "samuel",
+  "name": "Samuel",
+  "camp_role": "distiller of the camp's grog and rum",
+  "personality": {
+    "en": "Cheerful, always a little drunk, proud of his recipes. Generous with a drink, stingy with his secrets.",
+    "pl": "Pogodny, zawsze trochę wstawiony, dumny ze swoich receptur. Hojny w nalewaniu, skąpy w zdradzaniu sekretów."
+  },
+  "speech_style": {
+    "en": "Jovial, hiccups, praises his grog, toasts often.",
+    "pl": "Wesoło, czka, wychwala swój grog, często wznosi toasty."
+  },
+  "sample_lines": {
+    "en": [
+      "Here, try this. Best grog this side of the sea!",
+      "My recipe? Ha! Never."
+    ],
+    "pl": [
+      "Masz, spróbuj. Najlepszy grog po tej stronie morza!",
+      "Moja receptura? Ha! Nigdy."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "Cheers!",
+      "Come back thirsty."
+    ],
+    "pl": [
+      "Na zdrowie!",
+      "Wracaj spragniony."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "*hic* What?",
+      "Sorry, the fumes... say again?"
+    ],
+    "pl": [
+      "*hik* Co?",
+      "Wybacz, opary... powtórz?"
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "grog",
+    "greg"
+  ],
+  "relations": {
+    "greg": "Greg loves his grog, so Samuel is safe.",
+    "skip": "Begs for free grog."
+  },
+  "persuasion": "Praise for his grog, or bringing him ingredients.",
+  "items": []
+}

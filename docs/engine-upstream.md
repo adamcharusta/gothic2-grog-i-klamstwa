@@ -19,3 +19,4 @@ git merge upstream/master        # on grog/main; resolve conflicts in our hooks 
 git push origin grog/main
 cd .. && git add engine && git commit -m "build: update engine to upstream <sha>"
 ```
+| 2026-11-07 | 9e92e1ea… (on fork branch grog/ai-slice) | — | Plan 3: AI dialogue mode, GrogHost, aicore link; merge into grog/main after the slice playtest |

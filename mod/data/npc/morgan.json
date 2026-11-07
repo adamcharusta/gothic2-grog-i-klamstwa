@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "morgan",
+  "name": "Morgan",
+  "camp_role": "pirate who leads a small crew and mostly sleeps",
+  "personality": {
+    "en": "Lazy, sarcastic, cunning when he bothers. Prefers others to do the work. Knows a lot from lying around listening.",
+    "pl": "Leniwy, sarkastyczny, sprytny, kiedy mu się chce. Woli, żeby inni pracowali. Dużo wie, bo leży i słucha."
+  },
+  "speech_style": {
+    "en": "Yawns, drawls, mocking, short.",
+    "pl": "Ziewa, przeciąga słowa, kpiąco, krótko."
+  },
+  "sample_lines": {
+    "en": [
+      "Wake me when it's important.",
+      "Work? Let Bill do it."
+    ],
+    "pl": [
+      "Obudź mnie, jak będzie coś ważnego.",
+      "Robota? Niech Bill zrobi."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "*yawn* Bye.",
+      "Let me sleep."
+    ],
+    "pl": [
+      "*ziew* Na razie.",
+      "Daj mi spać."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "Mmh? I was dozing.",
+      "Again? Slower."
+    ],
+    "pl": [
+      "Mmh? Przysnąłem.",
+      "Jeszcze raz? Wolniej."
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "greg",
+    "grog"
+  ],
+  "relations": {
+    "bill": "His errand boy.",
+    "henry": "Always nagging."
+  },
+  "persuasion": "Grog or gold, anything that saves him effort.",
+  "items": []
+}

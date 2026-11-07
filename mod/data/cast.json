@@ -2,22 +2,92 @@
   "schema": 1,
   "quest_giver": "greg",
   "npcs": [
-    {"id": "greg", "name": "Greg"},
-    {"id": "francis", "name": "Francis"},
-    {"id": "garett", "name": "Garett"},
-    {"id": "samuel", "name": "Samuel"},
-    {"id": "alligator_jack", "name": "Alligator Jack"},
-    {"id": "henry", "name": "Henry"},
-    {"id": "morgan", "name": "Morgan"},
-    {"id": "bill", "name": "Bill"},
-    {"id": "brandon", "name": "Brandon"},
-    {"id": "matt", "name": "Matt"},
-    {"id": "owen", "name": "Owen"},
-    {"id": "malcolm", "name": "Malcolm"},
-    {"id": "skip", "name": "Skip"},
-    {"id": "angus", "name": "Angus"},
-    {"id": "hank", "name": "Hank"},
-    {"id": "bones", "name": "Bones"}
+    {
+      "id": "greg",
+      "name": "Greg",
+      "instance": "PIR_1320_ADDON_GREG"
+    },
+    {
+      "id": "francis",
+      "name": "Francis",
+      "instance": "PIR_1350_ADDON_FRANCIS"
+    },
+    {
+      "id": "garett",
+      "name": "Garett",
+      "instance": "PIR_1357_ADDON_GARETT"
+    },
+    {
+      "id": "samuel",
+      "name": "Samuel",
+      "instance": "PIR_1351_ADDON_SAMUEL"
+    },
+    {
+      "id": "alligator_jack",
+      "name": "Alligator Jack",
+      "instance": "PIR_1352_ADDON_ALLIGATORJACK"
+    },
+    {
+      "id": "henry",
+      "name": "Henry",
+      "instance": "PIR_1354_ADDON_HENRY"
+    },
+    {
+      "id": "morgan",
+      "name": "Morgan",
+      "instance": "PIR_1353_ADDON_MORGAN"
+    },
+    {
+      "id": "bill",
+      "name": "Bill",
+      "instance": "PIR_1356_ADDON_BILL"
+    },
+    {
+      "id": "brandon",
+      "name": "Brandon",
+      "instance": "PIR_1366_ADDON_BRANDON"
+    },
+    {
+      "id": "matt",
+      "name": "Matt",
+      "instance": "PIR_1365_ADDON_MATT"
+    },
+    {
+      "id": "owen",
+      "name": "Owen",
+      "instance": "PIR_1367_ADDON_OWEN"
+    },
+    {
+      "id": "malcolm",
+      "name": "Malcolm",
+      "instance": "PIR_1368_ADDON_MALCOM"
+    },
+    {
+      "id": "skip",
+      "name": "Skip",
+      "instance": "PIR_1355_ADDON_SKIP"
+    },
+    {
+      "id": "angus",
+      "name": "Angus",
+      "instance": "PIR_1370_ADDON_ANGUS"
+    },
+    {
+      "id": "hank",
+      "name": "Hank",
+      "instance": "PIR_1371_ADDON_HANK"
+    },
+    {
+      "id": "bones",
+      "name": "Bones",
+      "instance": "PIR_1362_ADDON_BONES"
+    }
   ],
-  "motives": ["greed", "revenge", "bet", "accident", "prank"]
+  "motives": [
+    "greed",
+    "revenge",
+    "bet",
+    "accident",
+    "prank"
+  ]
 }

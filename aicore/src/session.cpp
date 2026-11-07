@@ -77,6 +77,25 @@ Result<GameData> loadGameData(const fs::path& dir) {
   d.actorRules = ar.value();
   d.directorRules = dr.value();
 
+  auto items = readJson(dir / "items.json");
+  if(!items.ok())
+    return items.error();
+  if(!items.value().contains("items") || !items.value()["items"].is_object())
+    return Error{ErrorKind::Io, "items.json: 'items' object missing"};
+  for(auto& [id, inst] : items.value()["items"].items())
+    if(inst.is_string())
+      d.items[id] = inst.get<std::string>();
+
+  auto start = readJson(dir / "start.json");
+  if(!start.ok())
+    return start.error();
+  const json& sj = start.value();
+  if(!sj.contains("world") || !sj["world"].is_string() || !sj.contains("waypoint") || !sj["waypoint"].is_string() ||
+     !sj.contains("armor") || !sj["armor"].is_string() || !sj.contains("level") || !sj["level"].is_number_integer())
+    return Error{ErrorKind::Io, "start.json: world, waypoint, armor and level are required"};
+  d.start = {sj["world"].get<std::string>(), sj["waypoint"].get<std::string>(), sj["armor"].get<std::string>(),
+             sj["level"].get<int>()};
+
   if(fs::exists(dir / "pricing.json")) {
     auto pj = readJson(dir / "pricing.json");
     if(!pj.ok())

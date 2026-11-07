@@ -2,6 +2,7 @@
 #include <grog/ai/cards.h>
 #include <grog/ai/commands.h>
 #include <grog/ai/config.h>
+#include <grog/ai/io.h>
 #include <grog/ai/llm.h>
 #include <grog/ai/prompt.h>
 #include <grog/ai/rng.h>
@@ -20,6 +21,13 @@
 
 namespace grog::ai {
 
+struct StartSetup {
+  std::string world;     // e.g. ADDONWORLD.ZEN
+  std::string waypoint;  // where the hero starts
+  std::string armor;     // item instance equipped at start
+  int level = 1;
+};
+
 // Everything loaded from mod/data.
 struct GameData {
   Cast cast;
@@ -28,6 +36,8 @@ struct GameData {
   std::string actorRules;
   std::string directorRules;
   Pricing pricing;
+  std::map<std::string, std::string> items;  // story item id -> engine item instance (items.json)
+  StartSetup start;                          // start.json
 };
 
 // Loads cast.json, places.json, npc/*.json, lore/*.json, rules/actor.md, rules/director.md, pricing.json.

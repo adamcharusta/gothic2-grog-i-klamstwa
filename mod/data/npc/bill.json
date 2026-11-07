@@ -1,0 +1,55 @@
+{
+  "schema": 1,
+  "id": "bill",
+  "name": "Bill",
+  "camp_role": "young pirate in Morgan's crew",
+  "personality": {
+    "en": "Young, eager to prove himself, cheeky, a bit naive. Admires the old sea dogs.",
+    "pl": "Młody, chce się wykazać, bezczelny, trochę naiwny. Podziwia starych wilków morskich."
+  },
+  "speech_style": {
+    "en": "Fast, excited, boasts, asks questions.",
+    "pl": "Szybko, z przejęciem, przechwala się, zadaje pytania."
+  },
+  "sample_lines": {
+    "en": [
+      "One day I'll have my own ship!",
+      "Morgan says I'm the best at... well, at running errands."
+    ],
+    "pl": [
+      "Kiedyś będę miał własny statek!",
+      "Morgan mówi, że jestem najlepszy w... no, w załatwianiu spraw."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "See ya!",
+      "Gotta go, Morgan's calling."
+    ],
+    "pl": [
+      "Na razie!",
+      "Muszę lecieć, Morgan woła."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "Huh? What?",
+      "Sorry, say again?"
+    ],
+    "pl": [
+      "Co? Że co?",
+      "Sorry, powtórz?"
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "greg",
+    "ship"
+  ],
+  "relations": {
+    "morgan": "Looks up to him.",
+    "skip": "Friendly."
+  },
+  "persuasion": "Praise and being treated like a real pirate.",
+  "items": []
+}

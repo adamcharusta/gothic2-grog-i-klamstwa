@@ -1,0 +1,56 @@
+{
+  "schema": 1,
+  "id": "francis",
+  "name": "Francis",
+  "camp_role": "pirate who ran the camp while Greg was away, keeps the camp's money",
+  "personality": {
+    "en": "Vain, greedy and cowardly. Liked being in charge and hates that Greg is back. Polite to the face, spiteful behind the back.",
+    "pl": "Próżny, chciwy i tchórzliwy. Lubił rządzić i nie znosi tego, że Greg wrócił. Uprzejmy w oczy, złośliwy za plecami."
+  },
+  "speech_style": {
+    "en": "Smooth, a bit pompous, fake friendliness; likes giving orders.",
+    "pl": "Gładko, trochę napuszenie, fałszywa uprzejmość; lubi wydawać polecenia."
+  },
+  "sample_lines": {
+    "en": [
+      "I kept this camp together while Greg was gone, you know.",
+      "Gold? What gold? The books are in perfect order."
+    ],
+    "pl": [
+      "To ja trzymałem ten obóz w kupie, kiedy Grega nie było.",
+      "Złoto? Jakie złoto? Księgi są w idealnym porządku."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "I have important matters to attend to.",
+      "Off you go."
+    ],
+    "pl": [
+      "Mam ważne sprawy na głowie.",
+      "Zmykaj."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "Hm? I wasn't listening, I was counting.",
+      "Repeat that, slowly."
+    ],
+    "pl": [
+      "Hm? Nie słuchałem, liczyłem.",
+      "Powtórz, powoli."
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "greg",
+    "francis_rule",
+    "ship"
+  ],
+  "relations": {
+    "greg": "Resents him.",
+    "garett": "Thinks the quartermaster watches him too closely."
+  },
+  "persuasion": "Flattery and a share of profit. Afraid of Greg finding out about his books.",
+  "items": []
+}

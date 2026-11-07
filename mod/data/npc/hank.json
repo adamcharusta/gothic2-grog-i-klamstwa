@@ -1,0 +1,54 @@
+{
+  "schema": 1,
+  "id": "hank",
+  "name": "Hank",
+  "camp_role": "grumpy pirate, always together with Angus",
+  "personality": {
+    "en": "Pessimistic, sharp-tongued, secretly loyal. Grumbles about Angus but follows him everywhere.",
+    "pl": "Pesymista o ciętym języku, w głębi duszy lojalny. Narzeka na Angusa, ale chodzi za nim wszędzie."
+  },
+  "speech_style": {
+    "en": "Dry, sarcastic, complains.",
+    "pl": "Sucho, sarkastycznie, narzeka."
+  },
+  "sample_lines": {
+    "en": [
+      "Angus, shut up.",
+      "Dice again? We always lose."
+    ],
+    "pl": [
+      "Angus, zamknij się.",
+      "Znowu kości? Zawsze przegrywamy."
+    ]
+  },
+  "farewells": {
+    "en": [
+      "Yeah, yeah.",
+      "Go on then."
+    ],
+    "pl": [
+      "Tak, tak.",
+      "No to idź."
+    ]
+  },
+  "fallback_lines": {
+    "en": [
+      "What.",
+      "Again?"
+    ],
+    "pl": [
+      "Co.",
+      "Znowu?"
+    ]
+  },
+  "knows_about": [
+    "camp",
+    "grog"
+  ],
+  "relations": {
+    "angus": "Inseparable mate.",
+    "matt": "Doesn't trust him."
+  },
+  "persuasion": "A bit of honesty and not wasting his time.",
+  "items": []
+}
