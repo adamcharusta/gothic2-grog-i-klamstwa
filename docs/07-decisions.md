@@ -45,3 +45,5 @@ Every significant decision goes here (date, who, decision, why). Changing a deci
 | 2026-11-07 | user | Design approved; public repo `adamcharusta/gothic2-grog-i-klamstwa` created | — |
 | 2026-11-07 | designer | Project licence MIT (same as OpenGothic), copyright Adam Charusta | Public repo needs a licence; user may change it |
 | 2026-11-07 | designer | Implementation split into 5 plans (docs/plans/README.md); only the next plan is written in detail | Later plans depend on findings |
+| 2026-11-07 | designer | AI layer lives in `aicore/` in the main repo (not `engine/common/aimod/`); the engine links it in Plan 3 | Builds/tests in seconds without the engine; keeps the fork diff tiny |
+| 2026-11-07 | designer | No hard-coded model prices; `mod/data/pricing.json` is filled by the user | Avoid wrong cost figures |

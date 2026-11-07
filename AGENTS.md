@@ -32,6 +32,17 @@ This holds even when the user talks to you in Polish. Only player-facing game te
 | [docs/plans/README.md](docs/plans/README.md) | Implementation roadmap and plans (one file per plan) |
 | [work/](work/) | Completed task reports + [work/INDEX.md](work/INDEX.md) |
 
+## Code layout
+
+| Path | What |
+|------|------|
+| `aicore/` | Engine-independent AI library (C++20): config, providers, scenario, world state, prompts, commands, telemetry, session. Tests: `tools\devicore.cmd` (Windows/MSVC) or `cmake -S aicore -B build/aicore && cmake --build build/aicore && ctest --test-dir build/aicore` |
+| `tools/grogai-cli/` | Terminal chat with the pirates using `aicore` |
+| `mod/data/` | Campaign data: cast, places, NPC cards, lore, rules, pricing |
+| `engine/` | OpenGothic fork (submodule) |
+| `tools/*.sh`, `tools/tests/` | Packaging/version tools and their bash tests (`bash tools/tests/run.sh`) |
+| `packaging/` | Launcher, installer, manifest, third-party notices |
+
 Tags in docs: **[U]** user decision (don't change without asking) · **[P]** designer proposal
 (may change, with a reason logged in `07-decisions.md`) · **[B]** left to the builder.
 
