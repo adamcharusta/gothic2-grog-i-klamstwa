@@ -8,6 +8,6 @@ because they depend on what was learned (see `work/`).
 |---|------|----------|--------|
 | 1 | [Foundation & CI/CD](2026-11-07-01-foundation-ci.md) | Repo hygiene files, VERSION, OpenGothic fork as submodule, CI build of the engine, beta/release packages (zip + installer) | done (beta.2 published; user smoke test pending) |
 | 2 | [AI core library](2026-11-07-02-ai-core.md) | Engine-independent C++ library `aicore/`: config, HTTP, LLM clients (Anthropic + OpenAI-compatible), mock provider, scenario roller + clue graph, world state, prompt assembly (actor/director), command parser/validator, telemetry; unit tests in CI | done |
-| 3 | Engine integration — vertical slice | Fork hooks: AI dialogue mode (text field + "End"), NPC speaks arbitrary text, dynamic quest log, camp-only world setup, Greg → Skip → Matt playable on one scenario type with one provider | not written |
-| 4 | Full campaign | All camp NPC cards PL/EN, lore base, 4 scenario types, story items, director + live events, endings and summary screen | not written |
-| 5 | Persistence & release | Save/load of AI state, failure handling polish, benchmark aggregation script, README PL/EN with provider guides, first public release | not written |
+| 3 | [Engine integration — vertical slice](2026-11-07-03-engine-slice.md) | Fork hooks: AI dialogue mode (text field + "End"), NPC speaks arbitrary text, dynamic quest log, camp-only world setup, Greg → Skip → Matt playable on one scenario type with one provider | implemented, playtest pending |
+| 4 | [Campaign logic](2026-11-07-04-campaign-logic.md) | All camp NPC cards PL/EN, lore base, 4 scenario types, story items, director + live events, endings and summary screen | implemented (logic tested; engine hooks need playtest) |
+| 5 | Persistence & release | ~~Save/load of AI state~~ (done in Plan 4), failure handling polish, benchmark aggregation script, README PL/EN with provider guides, first public release | not written |

@@ -14,3 +14,4 @@ One row per task. Details in the report file. Template: [_TEMPLATE.md](_TEMPLATE
 | 0008 | 2026-11-07 | partial | Branch protection, beta 2 (user smoke test pending) | [0008-branch-protection-beta2.md](0008-branch-protection-beta2.md) |
 | 0009 | 2026-11-07 | done | AI core library aicore + grogai-cli (Plan 2) | [0009-ai-core-library.md](0009-ai-core-library.md) |
 | 0010 | 2026-11-07 | partial | Engine vertical slice: AI dialogue in game (playtest pending) | [0010-engine-slice.md](0010-engine-slice.md) |
+| 0011 | 2026-11-07 | partial | Campaign logic: endings, fights, director, save/load (playtest pending) | [0011-campaign-logic.md](0011-campaign-logic.md) |
