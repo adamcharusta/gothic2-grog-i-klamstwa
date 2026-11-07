@@ -16,6 +16,7 @@ Legend summary:
 | [docs/06-benchmark-and-testing.md](docs/06-benchmark-and-testing.md) | Logs, metrics, tests |
 | [docs/07-decisions.md](docs/07-decisions.md) | Decision log |
 | [docs/08-open-questions.md](docs/08-open-questions.md) | Open questions for the user |
+| [docs/engine-upstream.md](docs/engine-upstream.md) | Engine fork and upstream tracking |
 | [docs/09-repo-ci-and-versioning.md](docs/09-repo-ci-and-versioning.md) | Branches, GitHub Actions, packages, versioning, repo hygiene files |
 | [work/INDEX.md](work/INDEX.md) | What's already done |
 

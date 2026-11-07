@@ -1,0 +1,39 @@
+# Default: normalise all text to LF (main EOL is Linux).
+* text=auto eol=lf
+
+# Windows tools that require CRLF
+*.bat      text eol=crlf
+*.cmd      text eol=crlf
+*.sln      text eol=crlf
+*.vcxproj* text eol=crlf
+*.iss      text eol=crlf
+
+# Gothic Daedalus scripts: LF, encoding left as-is (Windows-1250). Never re-encode to UTF-8.
+*.d   text eol=lf
+*.src text eol=lf
+
+# Binary files
+*.png binary
+*.jpg binary
+*.tga binary
+*.tex binary
+*.fnt binary
+*.wav binary
+*.ogg binary
+*.mp3 binary
+*.zen binary
+*.dat binary
+*.vdf binary
+*.mod binary
+*.mds binary
+*.msb binary
+*.mrm binary
+*.mdl binary
+*.mdm binary
+*.mdh binary
+*.man binary
+*.exe binary
+*.dll binary
+*.zip binary
+*.ttf binary
+*.ico binary

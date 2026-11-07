@@ -1,0 +1,57 @@
+# Push to master: build and publish the official release vX.Y.Z.
+# Fails on purpose if tag vX.Y.Z already exists (bump VERSION in the develop -> master PR).
+name: Release
+
+on:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  version:
+    runs-on: ubuntu-24.04
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - id: v
+        run: echo "version=$(bash tools/version.sh release)" >> "$GITHUB_OUTPUT"
+
+  build:
+    needs: version
+    uses: ./.github/workflows/_build.yml
+    with:
+      version: ${{ needs.version.outputs.version }}
+
+  publish:
+    needs: [version, build]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      VERSION: ${{ needs.version.outputs.version }}
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - uses: actions/download-artifact@v6
+        with:
+          name: GrogIKlamstwa-${{ needs.version.outputs.version }}
+          path: dist
+      - name: Publish release
+        run: |
+          prev="$(git describe --tags --abbrev=0 --match 'v[0-9]*.[0-9]*.[0-9]*' --exclude '*-beta.*' 2>/dev/null || true)"
+          bash tools/changelog.sh $prev > notes.md
+          gh release create "v$VERSION" --target "$GITHUB_SHA" \
+            --title "Grog i kłamstwa $VERSION" --notes-file notes.md \
+            "dist/GrogIKlamstwa-$VERSION-win64.zip" "dist/GrogIKlamstwa-$VERSION-setup.exe"

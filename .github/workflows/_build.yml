@@ -1,0 +1,119 @@
+# Reusable build: repo tests, Windows engine build (mirrors upstream OpenGothic CI), package + installer.
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+env:
+  VK_SDK: '1.4.357.0'
+  BUILD_TYPE: RelWithDebInfo
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Repo tests
+        run: bash tools/tests/run.sh
+
+  engine:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - uses: ./.github/actions/setup-vulkan
+        with:
+          os: Windows
+          vk-sdk: ${{ env.VK_SDK }}
+
+      - uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            mingw-w64-x86_64-gcc
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-ninja
+            mingw-w64-x86_64-glslang
+
+      - name: Build version header
+        shell: pwsh
+        run: |
+          Set-Content -Path engine/game/build.h -Value @(
+            '#pragma once',
+            'static const char* appBuild = "Grog i klamstwa ${{ inputs.version }}";'
+          )
+
+      - name: Configure
+        run: cmake -S engine -B engine/build -G Ninja -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+      - name: Build
+        run: cmake --build engine/build --target Gothic2Notr
+
+      - name: Copy runtime DLLs
+        run: |
+          cp "$MINGW_PREFIX/bin/libgcc_s_seh-1.dll" engine/build/opengothic/
+          cp "$MINGW_PREFIX/bin/libstdc++-6.dll" engine/build/opengothic/
+          cp "$MINGW_PREFIX/bin/libwinpthread-1.dll" engine/build/opengothic/
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: engine-bin
+          path: |
+            engine/build/opengothic/*.exe
+            engine/build/opengothic/*.dll
+          if-no-files-found: error
+
+  package:
+    needs: [checks, engine]
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: bash
+    env:
+      VERSION: ${{ inputs.version }}
+      # Stop Git Bash from rewriting /D... arguments of iscc into paths
+      MSYS2_ARG_CONV_EXCL: '*'
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: true
+
+      - uses: actions/download-artifact@v6
+        with:
+          name: engine-bin
+          path: dist/engine
+
+      - name: Assemble package
+        run: bash tools/package.sh --version "$VERSION" --engine-dir dist/engine --out dist
+
+      - name: Build installer
+        run: |
+          choco install innosetup -y --no-progress
+          export PATH="$PATH:/c/Program Files (x86)/Inno Setup 6"
+          iscc packaging/installer.iss \
+            "/DAppVersion=$VERSION" \
+            "/DSourceDir=$(cygpath -w "$PWD/dist/GrogIKlamstwa-$VERSION-win64")" \
+            "/DOutputDir=$(cygpath -w "$PWD/dist")"
+
+      - uses: actions/upload-artifact@v6
+        with:
+          name: GrogIKlamstwa-${{ inputs.version }}
+          path: |
+            dist/GrogIKlamstwa-${{ inputs.version }}-win64.zip
+            dist/GrogIKlamstwa-${{ inputs.version }}-setup.exe
+          if-no-files-found: error

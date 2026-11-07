@@ -1,0 +1,34 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C/C++ and CMake: same style as upstream OpenGothic
+[*.{cpp,h,hpp,hh,cc,c}]
+indent_style = space
+indent_size = 2
+max_line_length = 120
+
+[{CMakeLists.txt,*.cmake}]
+indent_style = space
+indent_size = 2
+
+[*.{json,yml,yaml,sh,ini}]
+indent_style = space
+indent_size = 2
+
+[*.md]
+indent_style = space
+indent_size = 2
+trim_trailing_whitespace = false
+
+# Gothic Daedalus scripts: Windows-1250, tabs, as in the original scripts
+[*.{d,src}]
+charset = unset
+indent_style = tab
+
+[*.{bat,cmd,iss}]
+end_of_line = crlf
