@@ -148,6 +148,20 @@ std::vector<EngineAction> toEngineActions(const std::vector<Verdict>& verdicts, 
       e.kind = EngineAction::GiveItemToPlayer;
       e.npcInstance = speakerInst;
       e.itemInstance = it->second;
+    } else if(t == "take_item") {
+      auto it = data.items.find(str(a, "item"));
+      if(it == data.items.end() || speakerInst.empty())
+        continue;
+      e.kind = EngineAction::TakeItemFromPlayer;
+      e.npcInstance = speakerInst;
+      e.itemInstance = it->second;
+    } else if(t == "end_game") {
+      std::string o = str(a, "outcome");
+      if((o == "returned" || o == "fooled") && data.items.count(kRewardKey) && !speakerInst.empty())
+        out.push_back(EngineAction{EngineAction::GiveItemToPlayer, speakerInst, "", data.items.at(kRewardKey), "", "", ""});
+      e.kind = EngineAction::EndGame;
+      e.npcInstance = speakerInst;
+      e.text = o;
     } else if(t == "start_fight") {
       if(speakerInst.empty())
         continue;

@@ -28,6 +28,8 @@ struct AiConfig {
   std::optional<uint64_t> seed;
   bool debug = false;
   std::string logDir = "logs";
+  int directorIntervalS = 240;  // game seconds between Game Master calls
+  int directorMinGapS = 30;     // minimum gap, also for event triggers
 };
 
 using EnvLookup = std::function<std::optional<std::string>(std::string_view)>;

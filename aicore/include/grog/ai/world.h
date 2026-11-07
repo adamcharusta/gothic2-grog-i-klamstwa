@@ -15,7 +15,8 @@
 namespace grog::ai {
 
 inline constexpr const char* kTankard = "greg_tankard";
-inline constexpr int kWorldSaveVersion = 1;
+inline constexpr int kWorldSaveVersion = 2;
+inline constexpr const char* kRewardKey = "key_reward_chest";
 
 struct Fact {
   int64_t gameTimeS = 0;
@@ -46,6 +47,7 @@ class WorldState {
   std::vector<QuestEntry> quests;
   int eventsThisHour = 0;
   std::string activeMonster;  // "" when none
+  std::string ending;         // "" while playing; returned | fooled | caught | gave_up
 
   static WorldState fromScenario(const Scenario& s, const Cast& cast);
 

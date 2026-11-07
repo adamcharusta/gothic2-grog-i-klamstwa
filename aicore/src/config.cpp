@@ -135,6 +135,14 @@ Result<AiConfig> parseConfig(std::string_view iniText, const EnvLookup& env) {
     c.actor.temperature = v;
   }
 
+  if(auto t = get(m, "ai.director_interval_s"); !t.empty()) {
+    int v = 0;
+    auto [p, ec] = std::from_chars(t.data(), t.data() + t.size(), v);
+    if(ec != std::errc() || p != t.data() + t.size() || v < 30)
+      return configError("director_interval_s must be a whole number >= 30");
+    c.directorIntervalS = v;
+  }
+
   c.director = c.actor;
   if(auto dm = get(m, "ai.director_model"); !dm.empty())
     c.director.model = dm;

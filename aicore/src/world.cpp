@@ -52,7 +52,8 @@ json toJson(const WorldState& w) {
           {"facts", facts},
           {"quests", quests},
           {"events_this_hour", w.eventsThisHour},
-          {"active_monster", w.activeMonster}};
+          {"active_monster", w.activeMonster},
+          {"ending", w.ending}};
 }
 
 Result<WorldState> worldFromJson(const json& j) {
@@ -84,6 +85,7 @@ Result<WorldState> worldFromJson(const json& j) {
       w.quests.push_back({q.at("quest").get<std::string>(), q.at("text").get<std::string>(), q.at("t").get<int64_t>()});
     w.eventsThisHour = j.at("events_this_hour").get<int>();
     w.activeMonster = j.at("active_monster").get<std::string>();
+    w.ending = j.at("ending").get<std::string>();
   } catch(const json::exception& e) {
     return Error{ErrorKind::Io, std::string("save data: ") + e.what()};
   }

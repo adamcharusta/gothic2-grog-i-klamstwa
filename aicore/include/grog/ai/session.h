@@ -15,6 +15,7 @@
 #include <map>
 #include <mutex>
 #include <optional>
+#include <set>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -52,6 +53,10 @@ struct TurnResult {
   bool usedFallback = false;
 };
 
+struct Ending {
+  std::string outcome;  // returned | fooled | caught | gave_up
+};
+
 struct DirectorResult {
   std::vector<Verdict> verdicts;
   std::string thought;
@@ -73,6 +78,23 @@ class GameSession {
   DirectorResult direct(std::string_view trigger, int64_t gameTimeS);
   std::string farewell(std::string_view npc);
 
+  // Story items the engine found in the hero's inventory (ids from items.json).
+  void syncPlayerItems(const std::set<std::string>& storyItemsOnPlayer);
+  // A fist fight between the player and an NPC ended.
+  void reportFight(std::string_view npc, bool playerWon, int64_t gameTimeS);
+
+  // Game Master clock: due on the interval or after a trigger (min gap), never while a call is in flight.
+  bool directorDue(int64_t gameTimeS);
+  void trigger(std::string reason);
+  std::future<DirectorResult> directAsync(std::string trigger, int64_t gameTimeS);
+
+  std::optional<Ending> ending();
+  nlohmann::json summary();
+
+  // Save/load of the whole AI state. Loading discards answers still in flight.
+  nlohmann::json saveState();
+  Result<bool> loadState(const nlohmann::json& j);
+
   // Locked copy, safe from any thread.
   WorldState worldSnapshot();
   // Direct access: only when no talk/direct call is in flight (tests, single-threaded tools).
@@ -82,6 +104,12 @@ class GameSession {
 
  private:
   std::string fallbackLine(const NpcCard& card);
+  void translateItems(std::vector<Command>& actions) const;  // AI item handles -> internal ids
+
+  struct Stats {
+    int turns = 0, fallbacks = 0, directorCalls = 0, rejected = 0;
+    long long inputTokens = 0, outputTokens = 0;
+  };
 
   AiConfig config_;
   GameData data_;
@@ -91,6 +119,12 @@ class GameSession {
   WorldState world_;
   Rng rng_;
   std::mutex mu_;
+  uint64_t generation_ = 0;  // bumped by loadState: older in-flight answers are discarded
+  int64_t lastDirectorT_ = 0;
+  bool directorInFlight_ = false;
+  std::set<std::string> triggers_;
+  int64_t lastGameT_ = 0;
+  Stats stats_;
 };
 
 }  // namespace grog::ai

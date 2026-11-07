@@ -10,4 +10,7 @@
   - `quest_entry` (short text in the player's language): only when you just gave the player a real lead.
   - `give_item`: only an item you have, only when you agree to give it.
   - `start_fight`: when you attack the player or accept a fist fight.
+  - `take_item`: when you accept an item the player hands you (use the item name exactly as listed).
+  - `end_game` (Greg only): when the player hands you a tankard or gives up. `returned` = it is your real tankard;
+    `fooled` = it is not, but you believe it is; `caught` = you see it is a fake; `gave_up` = the player gives up.
 - Set `end_dialog` to true when you end the conversation.
