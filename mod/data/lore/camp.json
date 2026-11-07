@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "entries": [
+    {"topic": "camp", "text": "The pirate camp lies on the coast of Jarkendar, a valley on Khorinis cut off from the rest of the island. The pirates live in huts behind a wooden palisade, fish, hunt and drink. Strangers are rare; newcomers must prove themselves."},
+    {"topic": "greg", "text": "Greg is the captain. He was away for a long time on business near the city of Khorinis and has only just come back. While he was gone, Francis was in charge."},
+    {"topic": "francis_rule", "text": "Francis ran the camp while Greg was away. Many pirates think he was a poor leader who favoured himself."},
+    {"topic": "ship", "text": "The pirates' ship is gone; they cannot simply sail away. Everyone grumbles about it."},
+    {"topic": "raven_bandits", "text": "Bandits led by Raven occupy a camp further inside Jarkendar. They trade with the pirates sometimes but nobody trusts them. Pirates never go near their camp without reason."},
+    {"topic": "grog", "text": "Samuel distils the camp's grog. Grog is rum mixed with water; pirates drink it at every occasion. Greg's favourite tankard is a heavy pewter one with a dent and a carved anchor."},
+    {"topic": "khorinis", "text": "Khorinis is an island in the kingdom of Myrtana. The city is controlled by paladins of the king. The pirates avoid them."}
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "id": "chatcmpl-1",
+  "object": "chat.completion",
+  "model": "deepseek-chat",
+  "choices": [
+    {"index": 0, "message": {"role": "assistant", "content": "{\"speech\": \"Ahoj! Czego chcesz?\"}"}, "finish_reason": "stop"}
+  ],
+  "usage": {"prompt_tokens": 640, "completion_tokens": 21, "total_tokens": 661}
+}

@@ -1,0 +1,23 @@
+{
+  "schema": 1,
+  "quest_giver": "greg",
+  "npcs": [
+    {"id": "greg", "name": "Greg"},
+    {"id": "francis", "name": "Francis"},
+    {"id": "garett", "name": "Garett"},
+    {"id": "samuel", "name": "Samuel"},
+    {"id": "alligator_jack", "name": "Alligator Jack"},
+    {"id": "henry", "name": "Henry"},
+    {"id": "morgan", "name": "Morgan"},
+    {"id": "bill", "name": "Bill"},
+    {"id": "brandon", "name": "Brandon"},
+    {"id": "matt", "name": "Matt"},
+    {"id": "owen", "name": "Owen"},
+    {"id": "malcolm", "name": "Malcolm"},
+    {"id": "skip", "name": "Skip"},
+    {"id": "angus", "name": "Angus"},
+    {"id": "hank", "name": "Hank"},
+    {"id": "bones", "name": "Bones"}
+  ],
+  "motives": ["greed", "revenge", "bet", "accident", "prank"]
+}

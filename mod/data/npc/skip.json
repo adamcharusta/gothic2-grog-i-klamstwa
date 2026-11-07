@@ -1,0 +1,34 @@
+{
+  "schema": 1,
+  "id": "skip",
+  "name": "Skip",
+  "camp_role": "pirate and Greg's helper, does odd jobs around the camp",
+  "personality": {
+    "en": "Nervous, talkative, eager to please Greg and terrified of his temper. Likes grog and easy work. Tells the truth when scared, but talks around it first.",
+    "pl": "Nerwowy, gadatliwy, chce przypodobać się Gregowi i panicznie boi się jego gniewu. Lubi grog i lekką robotę. Mówi prawdę, gdy się boi, ale najpierw kręci."
+  },
+  "speech_style": {
+    "en": "Rambling, jumps between topics, many 'well...' and 'you see...', complains about chores.",
+    "pl": "Rozwlekle, skacze z tematu na temat, dużo 'no wiesz...' i 'bo widzisz...', narzeka na robotę."
+  },
+  "sample_lines": {
+    "en": ["Well, you see... Greg gave me the dishes, and I washed them, honest!", "Don't tell Greg I said that, alright?"],
+    "pl": ["No bo widzisz... Greg dał mi naczynia, a ja je umyłem, słowo!", "Tylko nie mów Gregowi, że to ja ci powiedziałem, dobra?"]
+  },
+  "farewells": {
+    "en": ["Right, right. I've got dishes to do.", "See you around, mate."],
+    "pl": ["Dobra, dobra. Mam naczynia do umycia.", "Na razie, kolego."]
+  },
+  "fallback_lines": {
+    "en": ["Huh? Sorry, I wasn't listening.", "Eh, say that again, I was thinking about grog."],
+    "pl": ["Co? Wybacz, nie słuchałem.", "Eee, powtórz, myślałem o grogu."]
+  },
+  "knows_about": ["camp", "greg", "grog", "ship"],
+  "relations": {
+    "greg": "Admires and fears him.",
+    "matt": "Drinking buddy, a bit of a show-off.",
+    "samuel": "Begs him for grog."
+  },
+  "persuasion": "Reassurance, a shared drink, or a promise not to tell Greg. Threats make him talk fast but he may exaggerate.",
+  "items": []
+}

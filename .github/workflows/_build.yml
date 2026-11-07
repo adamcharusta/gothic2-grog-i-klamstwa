@@ -24,6 +24,12 @@ jobs:
           fetch-depth: 0
       - name: Repo tests
         run: bash tools/tests/run.sh
+      - name: aicore unit tests
+        run: |
+          sudo apt-get update -q && sudo apt-get install -y -q ninja-build
+          cmake -S aicore -B build/aicore -G Ninja -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build/aicore
+          ctest --test-dir build/aicore --output-on-failure
 
   engine:
     runs-on: windows-latest
