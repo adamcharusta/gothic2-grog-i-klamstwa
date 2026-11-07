@@ -51,12 +51,15 @@ printf '%s\n' "$version" > "$stage/VERSION"
 cp "$root/LICENSE" "$stage/LICENSES/LICENSE"
 cp "$root/engine/LICENSE" "$stage/LICENSES/OpenGothic-LICENSE"
 cp "$root/packaging/THIRD_PARTY.md" "$stage/LICENSES/THIRD_PARTY.md"
+# Campaign data read by the engine at runtime (<root>/mod/data).
+mkdir -p "$stage/mod"
+cp -r "$root/mod/data" "$stage/mod/data"
 
 # Refuse forbidden content: AI key files, original game files, API keys in text files.
 forbidden="$(cd "$stage" && {
   find . -type f \( \( -iname 'GrogAI*.ini*' ! -name 'GrogAI.example.ini' \) -o -iname '*.local.ini' -o -name '.env' \
     -o -iname '*.vdf' -o -iname '*.mod' -o -iname '*.zen' -o -iname '*.dat' -o -iname '*.sav' \) -print
-  find . -type d \( -iname 'Data' -o -iname '_work' \) -print
+  find . -type d \( -iname 'Data' -o -iname '_work' \) ! -path './mod/data' -print
   grep -rlE --exclude='*.exe' --exclude='*.dll' 'sk-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{30,}' . || true
 })"
 if [[ -n "$forbidden" ]]; then
