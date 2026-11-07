@@ -70,6 +70,10 @@ jobs:
           cp "$MINGW_PREFIX/bin/libstdc++-6.dll" engine/build/opengothic/
           cp "$MINGW_PREFIX/bin/libwinpthread-1.dll" engine/build/opengothic/
 
+      # RelWithDebInfo keeps upstream's optimisation flags; ship binaries without the ~0.5 GB of debug info.
+      - name: Strip debug info
+        run: strip --strip-debug engine/build/opengothic/*.exe engine/build/opengothic/*.dll
+
       - uses: actions/upload-artifact@v6
         with:
           name: engine-bin
