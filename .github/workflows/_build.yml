@@ -107,8 +107,8 @@ jobs:
           export PATH="$PATH:/c/Program Files (x86)/Inno Setup 6"
           iscc packaging/installer.iss \
             "/DAppVersion=$VERSION" \
-            "/DSourceDir=$(cygpath -w "dist/GrogIKlamstwa-$VERSION-win64")" \
-            "/DOutputDir=$(cygpath -w dist)"
+            "/DSourceDir=$(cygpath -w "$PWD/dist/GrogIKlamstwa-$VERSION-win64")" \
+            "/DOutputDir=$(cygpath -w "$PWD/dist")"
 
       - uses: actions/upload-artifact@v6
         with:

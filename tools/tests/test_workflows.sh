@@ -21,6 +21,7 @@ assert_contains "$build" "--target Gothic2Notr" "_build builds the game target"
 assert_contains "$build" "iscc" "_build compiles the installer"
 assert_contains "$build" "tools/tests/run.sh" "_build runs repo tests"
 assert_contains "$build" "tools/package.sh" "_build packages"
+assert_contains "$build" 'cygpath -w "$PWD/dist' "iscc gets absolute paths (iscc resolves relative ones against packaging/)"
 
 assert_contains "$ci" "pull_request" "ci runs on PRs"
 assert_contains "$ci" "version.sh dev" "ci uses dev version"
