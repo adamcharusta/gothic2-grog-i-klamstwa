@@ -1,0 +1,5 @@
+add_executable(grogai-cli main.cpp)
+target_link_libraries(grogai-cli PRIVATE aicore)
+if(MSVC)
+  target_compile_options(grogai-cli PRIVATE /utf-8)
+endif()

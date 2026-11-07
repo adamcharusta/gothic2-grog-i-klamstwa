@@ -21,6 +21,7 @@ assert_contains "$build" "--target Gothic2Notr" "_build builds the game target"
 assert_contains "$build" "iscc" "_build compiles the installer"
 assert_contains "$build" "strip --strip-debug" "_build strips debug info from shipped binaries"
 assert_contains "$build" "tools/tests/run.sh" "_build runs repo tests"
+assert_contains "$build" "ctest --test-dir build/aicore" "_build runs aicore unit tests"
 assert_contains "$build" "tools/package.sh" "_build packages"
 assert_contains "$build" 'cygpath -w "$PWD/dist' "iscc gets absolute paths (iscc resolves relative ones against packaging/)"
 
