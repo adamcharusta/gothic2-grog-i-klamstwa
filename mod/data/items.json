@@ -1,10 +1,22 @@
 {
   "schema": 1,
-  "note": "Story item id -> Gothic II NotR item instance.",
+  "note": "Story item id -> Gothic II NotR item instance. ai_names are the neutral handles the AI sees (it never sees internal ids); descriptions are shown to the AI.",
   "items": {
     "greg_tankard": "ITMI_SILVERCUP",
     "tankard_lookalike": "ITMI_GOLDCUP",
     "key_reward_chest": "ITKE_GREG_ADDON_MIS",
     "captain_outfit": "ITAR_PIR_H_ADDON"
+  },
+  "ai_names": {
+    "greg_tankard": "dented_pewter_tankard",
+    "tankard_lookalike": "plain_pewter_tankard",
+    "key_reward_chest": "chest_key",
+    "captain_outfit": "captain_coat"
+  },
+  "descriptions": {
+    "greg_tankard": "a heavy pewter tankard with a dent and a carved anchor",
+    "tankard_lookalike": "a pewter tankard, smooth, without a dent or any carving",
+    "key_reward_chest": "the key to Greg's chest",
+    "captain_outfit": "a captain's coat"
   }
 }

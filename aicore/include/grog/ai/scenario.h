@@ -48,6 +48,11 @@ struct Cast {
   std::vector<std::string> places;
   std::map<std::string, std::map<std::string, std::string>> placeNames;  // id -> {pl,en}
   std::map<std::string, std::string> placeWaypoints;                    // id -> engine waypoint
+  std::map<std::string, std::string> itemAiName;                        // story item id -> neutral handle the AI sees
+  std::map<std::string, std::string> itemDescription;                   // story item id -> description for the AI
+
+  std::string aiNameOf(const std::string& itemId) const;
+  std::string itemIdForAiName(const std::string& aiName) const;  // "" if unknown
   std::vector<std::string> motives;
 
   std::string displayName(const std::string& npcId) const;

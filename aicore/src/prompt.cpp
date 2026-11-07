@@ -136,9 +136,27 @@ LlmRequest buildActorRequest(const NpcCard& card, const WorldState& w, const Cas
   for(auto& i : card.items)
     if(std::find(own.begin(), own.end(), i) == own.end())
       own.push_back(i);
-  sys << "Items you have: " << (own.empty() ? std::string("nothing special") : "") ;
+  auto itemText = [&](const std::string& id) {
+    std::string t = cast.aiNameOf(id);
+    if(cast.itemDescription.count(id))
+      t += " (" + cast.itemDescription.at(id) + ")";
+    return t;
+  };
+  sys << "Items you have: " << (own.empty() ? std::string("nothing special") : "");
   for(size_t i = 0; i < own.size(); ++i)
-    sys << (i ? ", " : "") << own[i];
+    sys << (i ? ", " : "") << itemText(own[i]);
+  std::vector<std::string> carried;
+  for(auto& [item, holder] : w.itemHolder)
+    if(holder == "player")
+      carried.push_back(item);
+  if(!carried.empty()) {
+    sys << "\nThe player carries (and may offer you): ";
+    for(size_t i = 0; i < carried.size(); ++i)
+      sys << (i ? ", " : "") << itemText(carried[i]);
+  }
+  if(card.id == w.scenario.questGiver)
+    sys << "\nYou can tell your own tankard at a glance: a heavy pewter one with a dent and a carved anchor - "
+           "unless you are too drunk or the player distracts you well.";
   sys << "\n\n" << rulesText << "\n\nAlways reply in " << langWord(lang) << ".";
 
   LlmRequest req;
@@ -213,12 +231,13 @@ json actorReplySchema() {
       "speech": {"type": "string", "description": "What you say, in character, 1-3 sentences"},
       "gesture": {"type": "string", "enum": ["neutral", "angry", "laugh", "think", "shrug", "threaten", "drink"]},
       "actions": {"type": "array", "items": {"type": "object", "required": ["type"], "properties": {
-        "type": {"type": "string", "enum": ["attitude", "quest_entry", "give_item", "start_fight"]},
+        "type": {"type": "string", "enum": ["attitude", "quest_entry", "give_item", "take_item", "start_fight", "end_game"]},
         "delta": {"type": "integer", "minimum": -2, "maximum": 2},
         "text": {"type": "string"},
         "item": {"type": "string"},
         "npc": {"type": "string"},
-        "fact": {"type": "string"}
+        "fact": {"type": "string"},
+        "outcome": {"type": "string", "enum": ["returned", "fooled", "caught", "gave_up"]}
       }}},
       "end_dialog": {"type": "boolean"}
     }

@@ -177,6 +177,30 @@ std::vector<Verdict> validate(const std::vector<Command>& commands, std::string_
         v.accepted = true;
         it->second = "player";
       }
+    } else if(c.type == "take_item") {
+      std::string item = str(a, "item");
+      auto it = holders.find(item);
+      if(isDirector)
+        reject("the director cannot take items");
+      else if(item.empty() || it == holders.end() || it->second != "player")
+        reject("the player does not carry '" + item + "'");
+      else {
+        v.accepted = true;
+        it->second = std::string(speaker);
+      }
+    } else if(c.type == "end_game") {
+      std::string o = str(a, "outcome");
+      auto held = [&](const char* item) { auto h = holders.find(item); return h != holders.end() && h->second == speaker; };
+      if(speaker != cast.questGiver)
+        reject("only the quest giver ends the game");
+      else if(!w.ending.empty())
+        reject("the game has already ended");
+      else if(o == "returned" ? !held(kTankard)
+              : (o == "fooled" || o == "caught") ? !held("tankard_lookalike")
+              : o != "gave_up")
+        reject("outcome '" + o + "' does not match what the quest giver holds");
+      else
+        v.accepted = true;
     } else if(c.type == "start_fight") {
       if(isDirector)
         reject("the director cannot start a fight with the player");
@@ -263,6 +287,13 @@ void apply(const std::vector<Verdict>& verdicts, std::string_view speaker, World
       w.quests.push_back({q.empty() ? std::string("tankard") : q, str(a, "text"), gameTimeS});
     } else if(t == "give_item") {
       w.itemHolder[str(a, "item")] = "player";
+    } else if(t == "take_item") {
+      w.itemHolder[str(a, "item")] = who;
+    } else if(t == "end_game") {
+      w.ending = str(a, "outcome");
+      if((w.ending == "returned" || w.ending == "fooled") && w.itemHolder.count(kRewardKey) &&
+         w.itemHolder[kRewardKey] == who)
+        w.itemHolder[kRewardKey] = "player";
     } else if(t == "npc_knowledge") {
       w.npcs[str(a, "npc")].knows.push_back(str(a, "fact"));
     } else if(t == "spawn_monster") {

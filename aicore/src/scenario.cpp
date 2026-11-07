@@ -37,6 +37,16 @@ std::string Cast::displayName(const std::string& npcId) const {
 bool Cast::hasNpc(const std::string& npcId) const {
   return std::any_of(npcs.begin(), npcs.end(), [&](auto& m) { return m.id == npcId; });
 }
+std::string Cast::aiNameOf(const std::string& itemId) const {
+  auto it = itemAiName.find(itemId);
+  return it == itemAiName.end() ? itemId : it->second;
+}
+std::string Cast::itemIdForAiName(const std::string& aiName) const {
+  for(auto& [id, name] : itemAiName)
+    if(name == aiName)
+      return id;
+  return {};
+}
 bool Cast::hasPlace(const std::string& placeId) const {
   return std::find(places.begin(), places.end(), placeId) != places.end();
 }

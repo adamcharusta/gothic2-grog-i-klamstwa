@@ -20,10 +20,11 @@ std::optional<std::string> npcIdForInstance(const GameData& data, std::string_vi
 std::string instanceForNpc(const GameData& data, std::string_view npcId);
 
 struct EngineAction {
-  enum Kind { QuestEntry, GiveItemToPlayer, StartFight, NpcGoto, NpcApproachPlayer, NpcFightNpc, SpawnMonster, AmbientLine };
+  enum Kind { QuestEntry, GiveItemToPlayer, TakeItemFromPlayer, StartFight, NpcGoto, NpcApproachPlayer, NpcFightNpc,
+              SpawnMonster, AmbientLine, EndGame };
   Kind kind = QuestEntry;
   std::string npcInstance, npc2Instance, itemInstance, waypoint, monsterInstance;
-  std::string text;  // cp1250
+  std::string text;  // cp1250 (EndGame: outcome id)
 };
 
 // Accepted verdicts only; commands with no engine effect (attitude, npc_knowledge) and unmapped ids are skipped.
