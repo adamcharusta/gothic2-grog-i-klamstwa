@@ -1,0 +1,2 @@
+{"kind":"session","seed":333,"provider":"anthropic","actor_model":"claude-sonnet-5-5","director_model":"claude-sonnet-5-5","language":"en","t":0}
+{"kind":"request","role":"actor","npc":"skip","provider":"anthropic","ok":true,"model":"claude-sonnet-5-5","input_tokens":500,"output_tokens":50,"latency_ms":800.0,"cost_usd":0.002,"t":5}
