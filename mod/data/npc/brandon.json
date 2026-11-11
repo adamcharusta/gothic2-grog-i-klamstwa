@@ -11,6 +11,14 @@
     "en": "Grumbling, blunt, few words.",
     "pl": "Burczy, prosto z mostu, mało słów."
   },
+  "voice": {
+    "original": 4,
+    "name": "ballad",
+    "style": {
+      "en": "Rough, hearty pirate, gruff banter, teases newcomers, short blunt answers, a loud pleased grunt over good grog. Speak English.",
+      "pl": "Szorstki, krzepki pirat, rubaszne docinki, dogaduje nowym, odpowiada krótko i dosadnie, głośno sapie z zadowolenia nad dobrym grogiem. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Can't you see I'm working?",

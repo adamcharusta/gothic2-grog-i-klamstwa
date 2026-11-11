@@ -3,22 +3,38 @@
 namespace grog::ai {
 using nlohmann::json;
 
-double Pricing::estimate(const std::string& model, int inTok, int outTok) const {
-  auto it = perMillion.find(model);
-  if(it == perMillion.end()) {
-    // Providers report dated snapshots ("gpt-4.1-mini-2025-04-14"): use the longest listed name followed by '-'.
-    size_t best = 0;
-    for(auto i = perMillion.begin(); i != perMillion.end(); ++i) {
-      const std::string& k = i->first;
-      if(k.size() > best && model.size() > k.size() && model.compare(0, k.size(), k) == 0 && model[k.size()] == '-') {
-        best = k.size();
-        it = i;
-      }
+namespace {
+// Exact name, else the longest listed name followed by '-': providers report dated snapshots
+// ("gpt-4.1-mini-2025-04-14").
+template <class Map>
+typename Map::const_iterator findModel(const Map& m, const std::string& model) {
+  auto it = m.find(model);
+  if(it != m.end())
+    return it;
+  size_t best = 0;
+  for(auto i = m.begin(); i != m.end(); ++i) {
+    const std::string& k = i->first;
+    if(k.size() > best && model.size() > k.size() && model.compare(0, k.size(), k) == 0 && model[k.size()] == '-') {
+      best = k.size();
+      it = i;
     }
-    if(best == 0)
-      return -1.0;
   }
+  return best == 0 ? m.end() : it;
+}
+}  // namespace
+
+double Pricing::estimate(const std::string& model, int inTok, int outTok) const {
+  auto it = findModel(perMillion, model);
+  if(it == perMillion.end())
+    return -1.0;
   return (inTok * it->second.first + outTok * it->second.second) / 1'000'000.0;
+}
+
+double Pricing::estimateTts(const std::string& model, int audioMs) const {
+  auto it = findModel(ttsPerMinute, model);
+  if(it == ttsPerMinute.end())
+    return -1.0;
+  return it->second * audioMs / 60'000.0;
 }
 
 Result<Pricing> loadPricing(const json& j) {
@@ -30,6 +46,12 @@ Result<Pricing> loadPricing(const json& j) {
     if(!v.contains("input") || !v.contains("output") || !v["input"].is_number() || !v["output"].is_number())
       return Error{ErrorKind::Io, "pricing.json: model " + model + " needs numeric input/output"};
     p.perMillion[model] = {v["input"].get<double>(), v["output"].get<double>()};
+  }
+  const json tts = j.value("tts", json::object());
+  for(auto& [model, v] : tts.items()) {
+    if(!v.is_object() || !v.contains("usd_per_minute") || !v["usd_per_minute"].is_number())
+      return Error{ErrorKind::Io, "pricing.json: tts model " + model + " needs a numeric usd_per_minute"};
+    p.ttsPerMinute[model] = v["usd_per_minute"].get<double>();
   }
   return p;
 }
@@ -80,6 +102,34 @@ double Telemetry::request(std::string_view role, std::string_view npc, std::stri
     l["error_message"] = reply.error().message;
     if(logContent_)
       l["request"] = requestText;
+  }
+  write(std::move(l));
+  return spent;
+}
+
+double Telemetry::tts(std::string_view npc, std::string_view model, const Result<TtsReply>& reply, size_t chars,
+                      bool cached) {
+  double spent = 0.0;
+  json l = {{"kind", "tts"}, {"npc", npc}, {"ok", reply.ok()}, {"chars", chars}, {"cached", cached}};
+  if(reply.ok()) {
+    const TtsReply& r = reply.value();
+    std::string m = r.model.empty() ? std::string(model) : r.model;
+    l["model"] = m;
+    l["audio_ms"] = r.audioMs;
+    l["latency_ms"] = r.latencyMs;
+    if(!cached) {
+      double cost = pricing_.estimateTts(m, r.audioMs);
+      spent = cost < 0 ? 0.0 : cost;
+      if(cost < 0)
+        l["price_unknown"] = true;
+    }
+    l["cost_usd"] = spent;
+  } else {
+    l["model"] = model;
+    l["audio_ms"] = 0;
+    l["latency_ms"] = 0;
+    l["cost_usd"] = 0.0;
+    l["error"] = errorKindName(reply.error().kind);
   }
   write(std::move(l));
   return spent;

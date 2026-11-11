@@ -94,6 +94,86 @@ Two more settings:
 - `director_model`: a cheaper model from the same provider for the Game Master.
 - `director_interval_s`: how often the Game Master steps in (default: every 240 game seconds).
 
+## NPC voice (optional)
+
+The pirates can speak their answers aloud. Voice is **off by default**; without it you get the subtitles only, exactly as before.
+It is configured in the `[tts]` section of `GrogAI.ini` (see `GrogAI.example.ini`). The hero's own lines are not voiced.
+
+With voice on, an NPC answer appears only when the audio is ready, so it takes longer: about a second more with OpenAI,
+several seconds with a local server on a CPU. The subtitle lasts as long as the audio, and Esc stops the voice. A quickload or
+a new game during a conversation waits for the running voice requests before it loads.
+
+### OpenAI voices
+
+If you already use an OpenAI key in `[ai]`, add this section (the `[ai]` key is reused when the `base_url` is the same):
+
+```ini
+[tts]
+provider = openai_compatible
+base_url = https://api.openai.com/v1
+model = gpt-4o-mini-tts
+```
+
+Every pirate gets his own OpenAI voice and a style text (a gruff drunk old pirate, a nervous young one, and so on).
+Pirates who share an original voice actor share an OpenAI voice too. Cost: `mod/data/pricing.json` assumes about
+$0.015 per minute of audio (`tts.gpt-4o-mini-tts.usd_per_minute`). That is an estimate: check OpenAI's current price list.
+A local OpenAI-compatible server (for example Kokoro-FastAPI) can be used too: put its address in `base_url`, and set `model`
+to a model that server offers. The pirates ask for OpenAI voice names (`onyx`, `ash`, ...), so the server must accept them
+(or map them to its own voices). Kokoro has other voice names and no Polish voice, so check its docs first.
+
+### Original voices (local cloning, advanced)
+
+With `voices = original` the pirates talk in voices cloned from the original Polish dub of Gothic II. These voices speak
+**Polish only** (the generated configuration uses `language: pl`), so use this mode with `[game] language = pl`.
+Cloning happens **only on your PC, from your own legal copy of the game**. The mod ships no voice data. No cloud cloning service is used or supported.
+The voices belong to the original voice actors: **never share or publish the extracted clips or the cloned lines.**
+
+You need a local OpenAI-compatible text-to-speech server that maps a voice name to a reference WAV and clones it
+(XTTS-v2 does that). The example below uses [openedai-speech](https://github.com/matatonic/openedai-speech). Note that this project
+is archived (since 2026-01-04) and its author calls it mostly obsolete. Any server with a `/v1/audio/speech` endpoint that maps a voice
+name to a reference WAV works the same way; openedai-speech is only the one whose configuration the tool below writes.
+Its reference audio is capped at 30 seconds.
+
+1. Extract the reference clips from your game (needs Python 3). `--out` is the `voices` folder of the server:
+
+   ```
+   python tools/voices/extract_voices.py --gothic "C:\Program Files (x86)\Steam\steamapps\common\Gothic II" --out "<openedai-speech folder>\voices"
+   ```
+
+   It reads `Data\Speech*.vdf`, writes `<pirate>.wav` for each of the 16 pirates (about 20 s each, change with `--seconds`) and a
+   `voice_to_speaker.yaml`. Exit code 0 = all 16 pirates, 1 = bad arguments, 2 = no `Data\Speech*.vdf` found,
+   3 = some pirates got no clip (they are listed on stderr). With exit code 3 the other pirates' clips and the yaml are still
+   written, but the pirates without a clip are missing from the yaml, so the server cannot voice them: the game shows the
+   voice hint and turns the voice off for the rest of the session. Fix the extraction before you play with this mode.
+   Angus and Hank have no lines of their own in the original game, so they use the generic voice of their actor and sound
+   the same.
+2. Copy `voice_to_speaker.yaml` to the server's `config\voice_to_speaker.yaml` (or merge it into yours) and start the server.
+3. Set in `GrogAI.ini`:
+
+   ```ini
+   [tts]
+   provider = openai_compatible
+   base_url = http://localhost:8000/v1
+   model = tts-1-hd
+   voices = original
+   timeout_s = 60
+   ```
+
+   Use the port your server listens on. A GPU is recommended: XTTS on a CPU takes seconds per line, and each
+   answer waits for it. Keep `timeout_s = 60` for slow machines.
+
+After re-extracting the clips or switching to another server, delete the `tts_cache` folder (next to the mod, or
+`%APPDATA%\GrogIKlamstwa\tts_cache`): it keeps old farewells and fallback lines in the old voices.
+
+### Voice problems
+
+If the voice does not work, the game shows one hint (wrong `[tts]` key, no credit, server unreachable, request rejected,
+server not returning a 16-bit WAV) and goes on with subtitles only. After a rejected key or request, or after two failed requests
+in a row, the voice stays off until you load a save or start a new game, so a dead server does not slow down every answer.
+Each request is logged as a `tts` line in `logs\session-<seed>.jsonl` (latency, characters, audio length, cost).
+`summary-<seed>.json` has `tts_requests`, `tts_errors`, `tts_audio_s`, `tts_cost_usd` and `tts_latency_avg_ms`.
+Fixed lines such as farewells and fallback lines are cached in `tts_cache\`.
+
 ## Tested models
 
 | Provider | Model | Result |

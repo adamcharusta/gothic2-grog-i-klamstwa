@@ -16,7 +16,7 @@ Tags: **[U]** user · **[P]** proposal · **[B]** builder.
   text field + "End" button instead of the choice list.
 - `common/game/gamescript.cpp`: registers ~200 Daedalus externals (`bindExternal`), incl. `ai_output`.
   Original `AI_Output` plays **named** lines (subtitle + audio file). We need a new path:
-  **an NPC speaks arbitrary text** (subtitle + gesture/animation, no audio; TTS later).
+  **an NPC speaks arbitrary text** (subtitle + gesture/animation; with `[tts]` on, also synthesized audio: `aicore` returns a WAV with the answer, the engine decodes it from memory and plays it with the subtitle; Esc stops it; see [05](05-ui-and-configuration.md)).
 - `common/game/questlog.*`: the quest log. AI entries must go in as dynamic text.
 - **No HTTP client** in the engine; we add one (HTTPS, async). [B] Library choice
   (e.g. WinHTTP on Windows behind an interface ready for libcurl elsewhere, or cpp-httplib + TLS).

@@ -11,6 +11,14 @@
     "en": "Barked orders, short sentences, sailor curses, calls the player 'boy' or 'landlubber'. Never polite.",
     "pl": "Wykrzykiwane rozkazy, krótkie zdania, marynarskie przekleństwa, mówi do gracza 'chłopcze' albo 'szczurze lądowy'. Nigdy uprzejmy."
   },
+  "voice": {
+    "original": 1,
+    "name": "onyx",
+    "style": {
+      "en": "Gruff, hoarse old captain, low and curt, dry scorn and open threats, sudden barked shouts, calls you landlubber. Speak English.",
+      "pl": "Szorstki, chrapliwy stary kapitan, nisko i krótko, sucha pogarda i otwarte groźby, nagle wrzaśnie, mówi „szczurze lądowy”. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": ["Don't stand there gawping, boy. Find my tankard!", "Who's been drinking from MY tankard? I'll have his hide!"],
     "pl": ["Nie stój tak z otwartą gębą, chłopcze. Znajdź mój kufel!", "Kto pił z MOJEGO kufla? Obedrę go ze skóry!"]

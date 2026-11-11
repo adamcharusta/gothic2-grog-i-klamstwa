@@ -11,6 +11,10 @@ namespace grog::ai {
 
 enum class ProviderKind { Anthropic, OpenAiCompatible, Mock };
 enum class Language { Pl, En };
+enum class TtsKind { Off, OpenAiCompatible };
+// OpenAi: card voice name + style text. Original: card id as the voice, no instructions
+// (a local cloning server with reference clips from the player's own game files).
+enum class TtsVoices { OpenAi, Original };
 
 struct ProviderConfig {
   ProviderKind kind = ProviderKind::Mock;
@@ -21,9 +25,20 @@ struct ProviderConfig {
   int timeoutS = 20;
 };
 
+struct TtsConfig {
+  TtsKind kind = TtsKind::Off;
+  std::string baseUrl;  // no trailing slash
+  std::string model = "gpt-4o-mini-tts";
+  std::string apiKey;   // never logged
+  int timeoutS = 15;
+  std::string cacheDir = "tts_cache";
+  TtsVoices voices = TtsVoices::OpenAi;
+};
+
 struct AiConfig {
   ProviderConfig actor;
   ProviderConfig director;  // same provider; model may differ (director_model)
+  TtsConfig tts;
   Language language = Language::Pl;
   std::optional<uint64_t> seed;
   bool debug = false;

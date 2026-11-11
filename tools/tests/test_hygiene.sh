@@ -15,10 +15,10 @@ for f in foo.png foo.zen foo.vdf foo.tga foo.dat; do
 done
 assert_eq "unspecified" "$(attr working-tree-encoding foo.d)" "Daedalus scripts are not re-encoded"
 
-for f in GrogAI.ini x.local.ini .env build/x dist/x.zip logs/a.jsonl Data/Anims.vdf _work/x a.sav Thumbs.db; do
+for f in GrogAI.ini x.local.ini .env build/x dist/x.zip logs/a.jsonl Data/Anims.vdf _work/x a.sav Thumbs.db tts_cache/x.wav bin/tts_cache/x.wav voices/greg.wav voices/voice_to_speaker.yaml; do
   assert_ok "$f is ignored" -- git check-ignore -q --no-index "$f"
 done
-for f in GrogAI.example.ini VERSION docs/00-vision.md mod/data/cast.json aicore/tests/data/x.json; do
+for f in GrogAI.example.ini VERSION docs/00-vision.md mod/data/cast.json aicore/tests/data/x.json tools/voices/extract_voices.py tools/tests/fixtures/make_speech_vdf.py; do
   assert_fail "$f is not ignored" -- git check-ignore -q --no-index "$f"
 done
 
@@ -53,5 +53,16 @@ done
 assert_contains "$(cat README.md)" "## Tested models" "README.md tested models section"
 assert_contains "$(cat README.pl.md)" "## Przetestowane modele" "README.pl.md tested models section"
 assert_contains "$(cat GrogAI.example.ini)" "required for openai_compatible" "example ini: base_url required for openai_compatible"
+
+# NPC voice (TTS) documentation and example config
+for readme in README.md README.pl.md; do
+  r="$(cat "$readme" 2>/dev/null)"
+  for p in "[tts]" "provider = openai_compatible" "voices = original" "extract_voices.py"; do
+    assert_contains "$r" "$p" "$readme mentions $p"
+  done
+done
+tts_ini="$(sed -n '/^\[tts\]/,$p' GrogAI.example.ini)"
+assert_contains "$tts_ini" "provider = off" "example ini: [tts] is off by default"
+assert_contains "$tts_ini" "voices = openai" "example ini: [tts] voices = openai line"
 
 finish

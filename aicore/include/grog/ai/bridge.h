@@ -24,7 +24,8 @@ struct EngineAction {
               SpawnMonster, AmbientLine, EndGame };
   Kind kind = QuestEntry;
   std::string npcInstance, npc2Instance, itemInstance, waypoint, monsterInstance;
-  std::string text;  // cp1250 (EndGame: outcome id)
+  std::string text;      // cp1250 (EndGame: outcome id)
+  std::string textUtf8;  // the same text before the cp1250 conversion (for speech synthesis)
 };
 
 // Accepted verdicts only; commands with no engine effect (attitude, npc_knowledge) and unmapped ids are skipped.

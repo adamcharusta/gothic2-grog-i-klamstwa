@@ -11,6 +11,14 @@
     "en": "Dry, sarcastic, complains.",
     "pl": "Sucho, sarkastycznie, narzeka."
   },
+  "voice": {
+    "original": 6,
+    "name": "fable",
+    "style": {
+      "en": "Grumbling, sour pirate, flat sarcasm, complaining in a weary voice, slow tempo. Speak English.",
+      "pl": "Zrzędzący, cierpki pirat, monotonny sarkazm, narzeka zmęczonym głosem, tempo wolne. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Angus, shut up.",

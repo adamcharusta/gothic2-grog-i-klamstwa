@@ -29,9 +29,10 @@ D="GrogIKlamstwa-0.1.0-beta.3-win64"
 for p in bin/Gothic2Notr.exe bin/libstdc++-6.dll system/GrogIKlamstwa.ini Start-GrogIKlamstwa.bat \
          GrogAI.example.ini VERSION README.md README.pl.md \
          LICENSES/LICENSE LICENSES/OpenGothic-LICENSE LICENSES/THIRD_PARTY.md \
-         mod/data/cast.json mod/data/npc/greg.json mod/data/rules/actor.md tools/bench/aggregate.py; do
+         mod/data/cast.json mod/data/npc/greg.json mod/data/rules/actor.md tools/bench/aggregate.py tools/voices/extract_voices.py; do
   assert_contains "$list" "$D/$p" "zip contains $p"
 done
+assert_eq "" "$(grep -iE '\.(wav|vdf)$' <<<"$list")" "zip holds no .wav or .vdf"
 STAGE="$TMP/out ł/$D"
 tp="$(cat "$STAGE/LICENSES/THIRD_PARTY.md" 2>/dev/null)"
 for lib in libwinpthread libstdc++ libgcc_s; do assert_contains "$tp" "$lib" "THIRD_PARTY lists bundled $lib"; done
@@ -72,6 +73,10 @@ assert_contains "$(cat "$TMP/err")" "GrogAI.ini" "forbidden file named"
 
 fake_engine; : > "$TMP/eng ł/Anims.vdf"
 pack >/dev/null 2>&1; assert_eq "4" "$?" "game archive refused"
+
+fake_engine; mkdir -p mod/data/voices; : > mod/data/voices/greg.wav
+pack >/dev/null 2>&1; assert_eq "4" "$?" "audio clip in package refused"
+rm -rf mod/data/voices
 
 fake_engine; cp README.md README.md.bak; echo "key sk-ant-aaaaaaaaaaaaaaaaaaaaaaaa" >> README.md
 pack >/dev/null 2>&1; assert_eq "4" "$?" "API key in text refused"

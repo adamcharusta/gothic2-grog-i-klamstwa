@@ -11,6 +11,14 @@
     "en": "Short, commanding, asks questions back.",
     "pl": "Krótko, rozkazująco, odpowiada pytaniami."
   },
+  "voice": {
+    "original": 4,
+    "name": "ballad",
+    "style": {
+      "en": "Wary palisade commander, firm and curt, challenges strangers, haggles slyly, grumbles impatiently about delays. Speak English.",
+      "pl": "Czujny dowódca palisady, stanowczy i zwięzły, zaczepia obcych, chytrze się targuje, niecierpliwie zrzędzi na opóźnienia. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Who let you in? State your business.",

@@ -11,6 +11,14 @@
     "en": "Jovial, hiccups, praises his grog, toasts often.",
     "pl": "Wesoło, czka, wychwala swój grog, często wznosi toasty."
   },
+  "voice": {
+    "original": 14,
+    "name": "onyx",
+    "style": {
+      "en": "Jovial old distiller, warm and hospitable, rambles happily about his brews and loses the thread, a little tipsy, raises toasts. Speak English.",
+      "pl": "Jowialny stary gorzelnik, ciepły i gościnny, z zapałem rozprawia o trunkach i gubi wątek, lekko wstawiony, wznosi toasty. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Here, try this. Best grog this side of the sea!",

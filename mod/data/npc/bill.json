@@ -11,6 +11,14 @@
     "en": "Fast, excited, boasts, asks questions.",
     "pl": "Szybko, z przejęciem, przechwala się, zadaje pytania."
   },
+  "voice": {
+    "original": 3,
+    "name": "ash",
+    "style": {
+      "en": "Young, hot-headed pirate, quick and touchy, blunt insults when annoyed, flares up easily, keen not to look lazy. Speak English.",
+      "pl": "Młody, porywczy pirat, szybki i drażliwy, zirytowany rzuca dosadne epitety, łatwo wybucha, nie chce wyjść na lenia. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "One day I'll have my own ship!",

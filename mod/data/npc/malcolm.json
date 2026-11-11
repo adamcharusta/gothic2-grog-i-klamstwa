@@ -11,6 +11,14 @@
     "en": "Friendly, slow, chuckles.",
     "pl": "Przyjaźnie, powoli, podśmiewa się."
   },
+  "voice": {
+    "original": 4,
+    "name": "ballad",
+    "style": {
+      "en": "Easygoing, unhurried lumberjack, friendly but plain-spoken, chuckles and mocks the bosses' speeches, a bit worn out by work. Speak English.",
+      "pl": "Spokojny, niespieszny drwal, przyjazny, ale mówi bez ogródek, chichocze i kpi z gadania przełożonych, trochę zmęczony robotą. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "A short rest never hurt anyone.",

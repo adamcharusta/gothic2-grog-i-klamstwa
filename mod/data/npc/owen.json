@@ -11,6 +11,14 @@
     "en": "Quiet, cautious, practical.",
     "pl": "Cicho, ostrożnie, praktycznie."
   },
+  "voice": {
+    "original": 13,
+    "name": "fable",
+    "style": {
+      "en": "Tired, worried lumberjack, quiet and earnest, sighs and complains about hard work, concern for his mate in his voice. Speak English.",
+      "pl": "Zmęczony, zatroskany drwal, mówi cicho i szczerze, wzdycha i narzeka na harówkę, w głosie troska o kumpla. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Careful out there, the woods aren't safe.",

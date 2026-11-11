@@ -11,6 +11,14 @@
     "en": "Businesslike, counts in gold, short and dry.",
     "pl": "Rzeczowo, liczy w złocie, krótko i sucho."
   },
+  "voice": {
+    "original": 9,
+    "name": "ash",
+    "style": {
+      "en": "Easygoing quartermaster, even and businesslike, a trader's patter, gossips in a lowered voice, sighs when grumbling about the captain. Speak English.",
+      "pl": "Swobodny kwatermistrz, równy, rzeczowy ton, kupiecka gadka, plotkuje ściszonym głosem, wzdycha, gdy narzeka na kapitana. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Everything has its price, mate.",

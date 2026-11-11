@@ -38,6 +38,10 @@ GrogAI.ini
 *.vdf
 *.mod
 
+# TTS: cached voice lines and extracted original-voice clips (game audio, never commit)
+tts_cache/
+/voices/
+
 # Agent scratch
 .superpowers/
 

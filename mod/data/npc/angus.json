@@ -11,6 +11,14 @@
     "en": "Laughs a lot, sings fragments of shanties, slaps backs.",
     "pl": "Dużo się śmieje, podśpiewuje szanty, klepie po plecach."
   },
+  "voice": {
+    "original": 6,
+    "name": "fable",
+    "style": {
+      "en": "Loud, jolly pirate, chatty and laughing a lot, lively tempo, slightly tipsy, sometimes breaking into song. Speak English.",
+      "pl": "Głośny, wesoły pirat, rozgadany i pełen śmiechu, tempo żwawe, lekko podchmielony, czasem zaśpiewa. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Ho ho! Fancy a game of dice?",

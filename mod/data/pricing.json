@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "note": "USD per million tokens, used only for the cost estimate in benchmark logs. Dated snapshot names (e.g. gpt-4.1-mini-2025-04-14) use the price of the listed base name. Check your provider's current price list; unknown models are logged with price_unknown=true and cost 0. Token counts are always logged.",
+  "note": "USD per million tokens, used only for the cost estimate in benchmark logs. Dated snapshot names (e.g. gpt-4.1-mini-2025-04-14) use the price of the listed base name. Check your provider's current price list; unknown models are logged with price_unknown=true and cost 0. Token counts are always logged. \"tts\" is USD per minute of generated audio; the gpt-4o-mini-tts value is an estimate - check it against your provider's current price list.",
   "models": {
     "gpt-4.1": {
       "input": 2.0,
@@ -21,6 +21,11 @@
     "gpt-4o-mini": {
       "input": 0.15,
       "output": 0.6
+    }
+  },
+  "tts": {
+    "gpt-4o-mini-tts": {
+      "usd_per_minute": 0.015
     }
   }
 }

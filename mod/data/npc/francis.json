@@ -11,6 +11,14 @@
     "en": "Smooth, a bit pompous, fake friendliness; likes giving orders.",
     "pl": "Gładko, trochę napuszenie, fałszywa uprzejmość; lubi wydawać polecenia."
   },
+  "voice": {
+    "original": 13,
+    "name": "fable",
+    "style": {
+      "en": "Blustering, self-important pirate, indignant outbursts and empty threats, loud while he feels safe, stammers and wheedles when pressed. Speak English.",
+      "pl": "Napuszony ważniak, oburzone wykrzyknienia i puste groźby, głośny, póki czuje się bezpiecznie, przyciśnięty jąka się i przymila. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "I kept this camp together while Greg was gone, you know.",

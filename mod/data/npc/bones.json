@@ -11,6 +11,14 @@
     "en": "Very few words, mutters, answers with questions.",
     "pl": "Bardzo mało słów, mruczy, odpowiada pytaniem."
   },
+  "voice": {
+    "original": 1,
+    "name": "onyx",
+    "style": {
+      "en": "Calm, low, matter-of-fact voice, few words, polite but firm brush-offs, a touch bored, cautious, never raises his voice. Speak English.",
+      "pl": "Spokojny, niski, rzeczowy głos, mało słów, grzecznie, ale stanowczo zbywa, trochę znudzony, ostrożny, nigdy nie podnosi głosu. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Hm.",

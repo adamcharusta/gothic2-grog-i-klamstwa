@@ -15,11 +15,17 @@ Every playthrough writes a file (e.g. JSONL in `logs/`) with:
 - game events (fights, items, quest log entries);
 - ending, play time, number of exchanges.
 
+With voice on, every TTS call also writes a line `{"kind":"tts","npc","model","ok","chars","audio_ms","latency_ms","cost_usd","cached","error"?}`
+(`price_unknown: true` when the model has no entry in `pricing.json` `tts`; cached lines cost 0; the provider's error text and the key are never logged).
+When repeated failures turn the voice off for the session, one more `{"kind":"tts","npc","disabled":true,"reason":<error kind>}` line is written.
+
 No API key, no personal data. Full conversation text behind a switch (on by default, local only).
 
 ## Summary [P]
 
 End screen and a `summary` file per playthrough: time, cost, average/max latency, rejected-command rate, ending.
+The summary also carries `tts_requests`, `tts_errors`, `tts_audio_s`, `tts_cost_usd` (from `pricing.json` `tts.<model>.usd_per_minute`, an estimate)
+and `tts_latency_avg_ms` (successful requests only); all 0 with voice off.
 [B] A small aggregation script comparing logs across runs or providers (e.g. Python), separate from the game.
 
 ## Cost and latency

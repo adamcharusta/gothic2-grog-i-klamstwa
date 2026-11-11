@@ -62,4 +62,7 @@ std::string schemaInstruction(const nlohmann::json& schema);
 // OpenAI reasoning models (o1/o3/o4, gpt-5*): they take max_completion_tokens and no temperature.
 bool isReasoningModel(std::string_view model);
 
+// Maps an HTTP error status to an Error (shared by the LLM and TTS clients); the body is never copied.
+Error statusError(int status, std::string_view provider);
+
 }  // namespace grog::ai

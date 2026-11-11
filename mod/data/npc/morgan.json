@@ -11,6 +11,14 @@
     "en": "Yawns, drawls, mocking, short.",
     "pl": "Ziewa, przeciąga słowa, kpiąco, krótko."
   },
+  "voice": {
+    "original": 7,
+    "name": "echo",
+    "style": {
+      "en": "Sleepy, lazy crew boss, yawning and drawling, groggy until he has had a drink, heavy irony, puffs himself up. Speak English.",
+      "pl": "Zaspany, leniwy dowódca, ziewa i przeciąga słowa, otępiały, póki się nie napije, ciężka ironia, puszy się swoją ważnością. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Wake me when it's important.",

@@ -57,11 +57,14 @@ cp -r "$root/mod/data" "$stage/mod/data"
 # Benchmark log aggregation (README: python tools/bench/aggregate.py logs).
 mkdir -p "$stage/tools/bench"
 cp "$root/tools/bench/aggregate.py" "$stage/tools/bench/"
+# Original-voices clip extraction (reads the player's own Speech*.vdf; the package never holds any audio).
+mkdir -p "$stage/tools/voices"
+cp "$root/tools/voices/extract_voices.py" "$stage/tools/voices/"
 
 # Refuse forbidden content: AI key files, original game files, API keys in text files.
 forbidden="$(cd "$stage" && {
   find . -type f \( \( -iname 'GrogAI*.ini*' ! -name 'GrogAI.example.ini' \) -o -iname '*.local.ini' -o -name '.env' \
-    -o -iname '*.vdf' -o -iname '*.mod' -o -iname '*.zen' -o -iname '*.dat' -o -iname '*.sav' \) -print
+    -o -iname '*.vdf' -o -iname '*.wav' -o -iname '*.mod' -o -iname '*.zen' -o -iname '*.dat' -o -iname '*.sav' \) -print
   find . -type d \( -iname 'Data' -o -iname '_work' \) ! -path './mod/data' -print
   grep -rlE --exclude='*.exe' --exclude='*.dll' 'sk-[A-Za-z0-9_-]{20,}|AIza[0-9A-Za-z_-]{30,}' . || true
 })"

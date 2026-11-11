@@ -140,7 +140,8 @@ std::vector<EngineAction> toEngineActions(const std::vector<Verdict>& verdicts, 
     EngineAction e;
     if(t == "quest_entry" || t == "quest_new") {
       e.kind = EngineAction::QuestEntry;
-      e.text = toGameText(str(a, "text"));
+      e.textUtf8 = str(a, "text");
+      e.text = toGameText(e.textUtf8);
     } else if(t == "give_item") {
       auto it = data.items.find(str(a, "item"));
       if(it == data.items.end() || speakerInst.empty())
@@ -162,6 +163,7 @@ std::vector<EngineAction> toEngineActions(const std::vector<Verdict>& verdicts, 
       e.kind = EngineAction::EndGame;
       e.npcInstance = speakerInst;
       e.text = o;
+      e.textUtf8 = o;
     } else if(t == "start_fight") {
       if(speakerInst.empty())
         continue;
@@ -174,7 +176,8 @@ std::vector<EngineAction> toEngineActions(const std::vector<Verdict>& verdicts, 
     } else if(t == "npc_approach_player") {
       e.kind = EngineAction::NpcApproachPlayer;
       e.npcInstance = instanceForNpc(data, str(a, "npc"));
-      e.text = toGameText(str(a, "text"));  // the NPC's opening line
+      e.textUtf8 = str(a, "text");  // the NPC's opening line
+      e.text = toGameText(e.textUtf8);
     } else if(t == "npc_fight_npc") {
       e.kind = EngineAction::NpcFightNpc;
       e.npcInstance = instanceForNpc(data, str(a, "npc"));
@@ -186,7 +189,8 @@ std::vector<EngineAction> toEngineActions(const std::vector<Verdict>& verdicts, 
     } else if(t == "ambient_line") {
       e.kind = EngineAction::AmbientLine;
       e.npcInstance = instanceForNpc(data, str(a, "npc"));
-      e.text = toGameText(str(a, "text"));
+      e.textUtf8 = str(a, "text");
+      e.text = toGameText(e.textUtf8);
     } else {
       continue;  // attitude, npc_knowledge: world-state only
     }
