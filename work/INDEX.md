@@ -18,3 +18,4 @@ One row per task. Details in the report file. Template: [_TEMPLATE.md](_TEMPLATE
 | 0012 | 2026-11-11 | partial | Fixes from the first playtest (CI build + playtest 2 pending) | [0012-playtest1-fixes.md](0012-playtest1-fixes.md) |
 | 0013 | 2026-11-11 | partial | Failure handling, benchmark script, README provider guides (playtest 2 + release pending) | [0013-plan5-release-prep.md](0013-plan5-release-prep.md) |
 | 0014 | 2026-11-11 | partial | Playtest 2: cast starting places, NPC hangouts, camera snap, log entry notice (in-game check pending) | [0014-playtest2-cast-places.md](0014-playtest2-cast-places.md) |
+| 0015 | 2026-11-11 | partial | NPC voice via TTS: OpenAI voices and local original-voice cloning (Plan 6; CI + playtest 3 pending) | [0015-voice-tts.md](0015-voice-tts.md) |

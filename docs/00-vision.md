@@ -29,10 +29,11 @@ The mod is a **benchmark / proof of concept** for the real goal: the whole of Go
 3. The AI changes the game live: quest log, items, attitude, fights, NPC movement, random events.
 4. The player chooses the AI provider and model (Claude, OpenAI, DeepSeek, OpenRouter, local Ollama/LM Studio…) with their own API key.
 5. The story is always completable, and the game never crashes on AI or network errors.
+6. Optional NPC voice via TTS (off by default): OpenAI voices, or voices cloned locally from the player's own copy of the original dub.
 
 ## Non-goals (this release)
 
-- Voice acting / TTS (next release; the architecture should leave room for it).
+- Voiced hero lines, streaming audio, cloud voice cloning, and shipping any voice data (NPC voice via TTS is a goal, see above).
 - Clickable suggested lines (only a text field and an "End" button).
 - The rest of Gothic's world, other camps, multiplayer.
 - Ikarus, LeGo, Union support.

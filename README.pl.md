@@ -94,6 +94,76 @@ Dwa dodatkowe ustawienia:
 - `director_model`: tańszy model tego samego dostawcy dla Mistrza Gry.
 - `director_interval_s`: jak często Mistrz Gry wkracza do akcji (domyślnie co 240 sekund gry).
 
+## Głos NPC (opcjonalnie)
+
+Piraci mogą mówić swoje odpowiedzi na głos. Głos jest **domyślnie wyłączony**; bez niego dostajesz same napisy, tak jak dotąd.
+Konfiguruje się go w sekcji `[tts]` pliku `GrogAI.ini` (wzór w `GrogAI.example.ini`). Kwestie bohatera nie są czytane na głos.
+
+Przy włączonym głosie odpowiedź NPC pojawia się dopiero, gdy audio jest gotowe, więc trwa to dłużej: około sekundy więcej z OpenAI,
+kilka sekund z lokalnym serwerem na procesorze. Napis trwa tyle, co dźwięk, a Esc przerywa głos. Szybkie wczytanie (quickload)
+albo nowa gra w trakcie rozmowy czeka na trwające zapytania o głos, zanim się załaduje.
+
+### Głosy OpenAI
+
+Jeśli w `[ai]` masz już klucz OpenAI, dodaj trzy linie (klucz z `[ai]` jest użyty ponownie, gdy `base_url` jest taki sam):
+
+```ini
+[tts]
+provider = openai_compatible
+base_url = https://api.openai.com/v1
+model = gpt-4o-mini-tts
+```
+
+Każdy pirat dostaje własny głos OpenAI i opis stylu (zachrypnięty pijany stary pirat, nerwowy młody i tak dalej).
+Piraci mający tego samego oryginalnego aktora dubbingowego dostają też ten sam głos OpenAI. Koszt: `mod/data/pricing.json` zakłada
+około 0,015 $ za minutę audio (`tts.gpt-4o-mini-tts.usd_per_minute`). To szacunek: sprawdź aktualny cennik OpenAI.
+Lokalny serwer zgodny z OpenAI (na przykład Kokoro-FastAPI) działa tak samo: wpisz jego adres w `base_url`.
+
+### Oryginalne głosy (lokalne klonowanie, dla zaawansowanych)
+
+Z `voices = original` piraci mówią głosami sklonowanymi z oryginalnego polskiego dubbingu Gothica II. Klonowanie odbywa się
+**wyłącznie na Twoim komputerze, z Twojej legalnej kopii gry**. Mod nie zawiera żadnych nagrań głosu. Chmurowe usługi klonowania
+nie są używane ani wspierane. Głosy należą do oryginalnych aktorów dubbingowych: **nigdy nie udostępniaj ani nie publikuj
+wyciągniętych próbek ani sklonowanych kwestii.**
+
+Potrzebujesz lokalnego serwera mowy zgodnego z OpenAI, który przypisuje nazwę głosu do referencyjnego pliku WAV i go klonuje
+(robi to XTTS-v2). Poniższy przykład używa [openedai-speech](https://github.com/matatonic/openedai-speech). Uwaga: ten projekt
+jest zarchiwizowany (od 2026-01-04), a jego autor nazywa go w większości przestarzałym. Działa każdy serwer z endpointem
+`/v1/audio/speech`, który przypisuje nazwę głosu do referencyjnego WAV; openedai-speech jest po prostu tym, którego konfigurację
+zapisuje narzędzie poniżej. Jego referencyjne audio jest ograniczone do 30 sekund.
+
+1. Wyciągnij próbki z gry (wymaga Pythona 3). `--out` to folder `voices` serwera:
+
+   ```
+   python tools/voices/extract_voices.py --gothic "C:\Program Files (x86)\Steam\steamapps\common\Gothic II" --out "<folder openedai-speech>\voices"
+   ```
+
+   Narzędzie czyta `Data\Speech*.vdf`, zapisuje `<pirat>.wav` dla każdego z 16 piratów (po około 20 s, zmienisz to przez `--seconds`)
+   oraz `voice_to_speaker.yaml`. Kod wyjścia 0 = wszyscy 16 piratów, 1 = błędne argumenty, 2 = brak `Data\Speech*.vdf`,
+   3 = część piratów bez próbki (lista na stderr). Angus i Hank nie mają w oryginale własnych kwestii, więc używają ogólnego głosu
+   swojego aktora i brzmią tak samo.
+2. Skopiuj `voice_to_speaker.yaml` do `config\voice_to_speaker.yaml` serwera (albo scal z własnym) i uruchom serwer.
+3. Ustaw w `GrogAI.ini`:
+
+   ```ini
+   [tts]
+   provider = openai_compatible
+   base_url = http://localhost:8000/v1
+   model = tts-1-hd
+   voices = original
+   timeout_s = 60
+   ```
+
+   Użyj portu, na którym nasłuchuje Twój serwer. Zalecana jest karta graficzna: XTTS na procesorze potrzebuje
+   kilku sekund na kwestię, a każda odpowiedź na nią czeka. Na wolnych komputerach zostaw `timeout_s = 60`.
+
+### Problemy z głosem
+
+Gdy głos nie działa, gra pokazuje jedną podpowiedź (zły klucz `[tts]`, brak środków, serwer niedostępny, serwer nie zwraca WAV)
+i toczy się dalej z samymi napisami. Każde zapytanie trafia jako linia `tts` do `logs\session-<seed>.jsonl` (czas, liczba znaków,
+długość audio, koszt). `summary-<seed>.json` zawiera `tts_requests`, `tts_errors`, `tts_audio_s`, `tts_cost_usd` i `tts_latency_avg_ms`.
+Stałe kwestie, jak pożegnania, są zapisywane w `tts_cache\`.
+
 ## Przetestowane modele
 
 | Dostawca | Model | Wynik |

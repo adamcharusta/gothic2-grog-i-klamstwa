@@ -49,6 +49,26 @@ log_dir = logs
 - The API key **never** goes into logs or crash dumps.
 - [P] A simple "Test AI connection" screen in the menu, or at least a clear message at startup if the config is broken.
 
+## NPC voice (TTS) [P]
+
+Optional, off by default. A separate `[tts]` section (the full commented block is in `GrogAI.example.ini`):
+
+| Key | Meaning |
+|-----|---------|
+| `provider` | `off` (default) or `openai_compatible` (`POST {base_url}/audio/speech`, WAV only) |
+| `base_url` | Required when on, e.g. `https://api.openai.com/v1` or a local server `http://localhost:8000/v1` |
+| `model` | `gpt-4o-mini-tts` (OpenAI); `tts-1-hd` for a local cloning server |
+| `api_key` | Or `GROGAI_TTS_API_KEY`. Empty and the same `base_url` as `[ai]`: the `[ai]` key is reused |
+| `timeout_s` | 5-60 (clamped). Use 60 for a local server on a CPU |
+| `cache_dir` | Default `tts_cache`; holds only fixed lines (farewells, fallbacks) |
+| `voices` | `openai` (default): OpenAI voice name + style text from the NPC card. `original`: the request carries the NPC id as the voice name, no style text; for a local cloning server fed by `tools/voices/extract_voices.py` |
+
+- An NPC answer is shown only when text and audio are both ready; the subtitle lasts as long as the audio; Esc stops the voice.
+- The hero's typed lines and director `ambient_line` prints are not voiced.
+- A broken `[tts]` config or a failing request never blocks the game: subtitles only, one hint per error kind (PL/EN).
+- The `[tts]` key is never logged. Original voices: clips are extracted on the player's PC from their own copy
+  (`Data\Speech*.vdf`), nothing is uploaded, the mod and package ship no voice data (the README says the voices belong to the original actors and must not be shared).
+
 ## Languages [U]
 
 PL and EN: mod UI, README, fallback lines, character style samples. NPCs speak the language set in the config.
