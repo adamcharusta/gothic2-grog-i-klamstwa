@@ -67,6 +67,21 @@ G2="$TMP/g2"; "$PY" "$FIX" --all "$G2" "$TMP/ref2" >/dev/null
 assert_eq 0 "$?" "all 16 pirates got a clip -> exit 0"
 assert_eq 16 "$(grep -c 'model: xtts' "$TMP/out ł/all/voice_to_speaker.yaml" 2>/dev/null)" "yaml has 16 entries"
 
+# corrupt archives (huge entry count, entry past EOF, root offset past EOF) are skipped, not fatal
+G3="$TMP/g3"; "$PY" "$FIX" --corrupt "$G3" "$TMP/ref3" >/dev/null
+"$PY" "$X" --gothic "$G3" --out "$TMP/out ł/corrupt" >/dev/null 2>"$TMP/logs/err3"
+assert_eq 3 "$?" "corrupt archives -> still runs (exit 3: other pirates have no clip)"
+err3="$(cat "$TMP/logs/err3")"
+assert_not_contains "$err3" "Traceback" "no traceback on corrupt archives"
+assert_contains "$err3" "Speech1.vdf" "huge entry count reported"
+assert_contains "$err3" "Speech3.vdf" "root offset past EOF reported"
+assert_ok "greg.wav identical despite a broken Greg entry" -- cmp -s "$OUT/greg.wav" "$TMP/out ł/corrupt/greg.wav"
+assert_ok "the valid entry of a partly broken archive is used" -- test -f "$TMP/out ł/corrupt/francis.wav"
+
+# usage error -> exit 1 (exit 2 means "no speech archives")
+"$PY" "$X" --out "$TMP/out ł/usage" >/dev/null 2>&1
+assert_eq 1 "$?" "missing --gothic -> exit 1"
+
 # no Data/Speech*.vdf -> exit 2
 mkdir -p "$TMP/empty/Data"
 "$PY" "$X" --gothic "$TMP/empty" --out "$TMP/out ł/none" >/dev/null 2>&1

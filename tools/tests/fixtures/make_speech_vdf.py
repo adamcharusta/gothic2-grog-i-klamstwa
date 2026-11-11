@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 """Build a tiny synthetic Gothic speech archive for tools/tests/test_voices.sh.
 
-Usage: make_speech_vdf.py [--all] <gothic dir> <ref dir>
+Usage: make_speech_vdf.py [--all] [--corrupt] <gothic dir> <ref dir>
 
 Writes <gothic dir>/Data/Speech_Addon.vdf (VDF v2) holding IMA-ADPCM WAVs (format tag 17, 44100 Hz, mono, block align
 1024, 4 bits) encoded from synthetic sine tones, and for every WAV <ref dir>/<NAME>.raw with the int16 LE samples the
 encoder's own reconstruction produces (what a correct decoder must output). Prints a JSON map name -> sample count.
 With --all, adds one SVM_<voice>_TEST.WAV per original voice of the cast, so every pirate gets a clip.
+With --corrupt, also writes broken archives next to the good one: Speech1.vdf (entry count 0xFFFFFFFF), Speech2.vdf
+(a Greg line whose size runs past the end of the file, plus a valid Francis line) and Speech3.vdf (root offset past
+the end of the file).
 No game data is involved: everything here is generated.
 """
 import json
@@ -121,7 +124,8 @@ def vdf(files):
 
 def main(argv):
     full = "--all" in argv
-    args = [a for a in argv if a != "--all"]
+    corrupt = "--corrupt" in argv
+    args = [a for a in argv if a not in ("--all", "--corrupt")]
     if len(args) != 2:
         print(__doc__, file=sys.stderr)
         return 1
@@ -151,6 +155,17 @@ def main(argv):
         (ref / (Path(name).stem.upper() + ".raw")).write_bytes(struct.pack(f"<{len(recon)}h", *recon))
     (gothic / "Data").mkdir(parents=True, exist_ok=True)
     (gothic / "Data" / "Speech_Addon.vdf").write_bytes(vdf(files))
+    if corrupt:
+        data = gothic / "Data"
+        good = vdf(files)
+        (data / "Speech1.vdf").write_bytes(good[:272] + struct.pack("<I", 0xFFFFFFFF) + good[276:])
+        francis, _ = wav(tone(1000, 300), True)
+        two = bytearray(vdf([("DIA_ADDON_GREG_HUGE_01_09.WAV", wav(tone(500, 300), True)[0]),
+                             ("DIA_ADDON_FRANCIS_OK_13_00.WAV", francis)]))
+        size_at = 296 + 80 + 64 + 4  # first file entry (after the root directory entry): its size field
+        two[size_at:size_at + 4] = struct.pack("<I", 0xFFFFFFF0)
+        (data / "Speech2.vdf").write_bytes(bytes(two))
+        (data / "Speech3.vdf").write_bytes(good[:288] + struct.pack("<I", 0xFFFFFF00) + good[292:])
     print(json.dumps(counts))
     return 0
 

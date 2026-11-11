@@ -64,24 +64,35 @@ class Entry:
 
 
 def read_vdf_index(path):
-    """Returns the file entries of a VDF v2 archive (directories skipped). Raises ValueError if it is not one."""
+    """Returns the file entries of a VDF v2 archive (directories skipped). Raises ValueError if it is not one or its
+    index does not fit in the file; entries whose data runs past the end of the file are skipped with a warning."""
     with open(path, "rb") as f:
+        file_size = f.seek(0, 2)
+        f.seek(0)
         head = f.read(296)
         if len(head) < 296 or head[256:272] != VDF_SIGNATURE:
             raise ValueError("not a VDF v2 archive")
         count, _files, _ts, _size, root, _version = struct.unpack("<6I", head[272:296])
+        if root < 296 or root > file_size or count > (file_size - root) // 80:
+            raise ValueError(f"index ({count} entries at offset {root}) does not fit in the file")
         f.seek(root)
         table = f.read(count * 80)
     if len(table) < count * 80:
         raise ValueError("truncated index")
-    entries = []
+    entries, broken = [], 0
     for i in range(count):
         e = table[i * 80:(i + 1) * 80]
         offset, size, kind, _attr = struct.unpack("<4I", e[64:80])
         if kind & VDF_DIRECTORY:
             continue
+        if offset + size > file_size:
+            broken += 1
+            continue
         name = e[:64].rstrip(b" \0").decode("latin-1")
         entries.append(Entry(name, path, offset, size))
+    if broken:
+        print(f"warning: {Path(path).name}: skipped {broken} entries that run past the end of the file",
+              file=sys.stderr)
     return entries
 
 
@@ -192,8 +203,15 @@ def pick(candidates, seconds, already=0.0):
     return chosen, total
 
 
+class _Parser(argparse.ArgumentParser):
+    def error(self, message):
+        """Usage errors exit 1 (argparse's own 2 means "no speech archives" for this tool)."""
+        self.print_usage(sys.stderr)
+        self.exit(1, f"{self.prog}: error: {message}\n")
+
+
 def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap = _Parser(description=__doc__.split("\n\n")[0])
     ap.add_argument("--gothic", required=True, help="Gothic II install dir (the one holding Data/Speech*.vdf)")
     ap.add_argument("--out", required=True, help="output dir: the openedai-speech voices/ folder")
     ap.add_argument("--seconds", type=float, default=20.0, help="target clip length per pirate (default 20)")
