@@ -26,9 +26,9 @@ jobs:
         run: bash tools/tests/run.sh
       - name: aicore unit tests
         run: |
-          sudo apt-get update -q && sudo apt-get install -y -q ninja-build
-          cmake -S aicore -B build/aicore -G Ninja -DCMAKE_BUILD_TYPE=Debug
-          cmake --build build/aicore
+          # Default generator (make is on the runner): no apt download that can fail on a mirror outage.
+          cmake -S aicore -B build/aicore -DCMAKE_BUILD_TYPE=Debug
+          cmake --build build/aicore --parallel
           ctest --test-dir build/aicore --output-on-failure
 
   engine:
