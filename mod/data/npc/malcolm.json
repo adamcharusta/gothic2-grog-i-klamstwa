@@ -12,10 +12,11 @@
     "pl": "Przyjaźnie, powoli, podśmiewa się."
   },
   "voice": {
-    "name": "fable",
+    "original": 4,
+    "name": "ballad",
     "style": {
-      "en": "Cheerful, easygoing lumberjack, slow and warm, lazy and relaxed, chuckling often. Speak English.",
-      "pl": "Pogodny, spokojny drwal, mówi powoli i ciepło, rozleniwiony, często się chichocze. Mów po polsku."
+      "en": "Easygoing, unhurried lumberjack, friendly but plain-spoken, chuckles and mocks the bosses' speeches, a bit worn out by work. Speak English.",
+      "pl": "Spokojny, niespieszny drwal, przyjazny, ale mówi bez ogródek, chichocze i kpi z gadania przełożonych, trochę zmęczony robotą. Mów po polsku."
     }
   },
   "sample_lines": {

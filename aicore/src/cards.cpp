@@ -54,6 +54,13 @@ bool readVoice(const json& j, NpcVoice& out, std::string& err) {
     }
     out.name = v["name"].get<std::string>();
   }
+  if(v.contains("original")) {
+    if(!v["original"].is_number_integer() || v["original"].get<long long>() < 0 || v["original"].get<long long>() > 999) {
+      err = "'voice.original' must be a whole number (0-999)";
+      return false;
+    }
+    out.original = v["original"].get<int>();
+  }
   if(v.contains("style")) {
     if(!v["style"].is_object()) {
       err = "'voice.style' must be an object";

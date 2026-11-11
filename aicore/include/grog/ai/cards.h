@@ -16,8 +16,11 @@ using LangLines = std::map<Language, std::vector<std::string>>;
 
 // TTS voice: an OpenAI voice name and a delivery instruction per language ("pl"/"en").
 // A card without a voice has an empty name (the session falls back to a default).
+// `original` is the voice number of the NPC's actor in the original game (0 = unknown);
+// cards sharing an actor share the OpenAI voice name.
 struct NpcVoice {
   std::string name;
+  int original = 0;
   std::map<std::string, std::string> style;
 };
 

@@ -12,10 +12,11 @@
     "pl": "Bardzo mało słów, mruczy, odpowiada pytaniem."
   },
   "voice": {
-    "name": "echo",
+    "original": 1,
+    "name": "onyx",
     "style": {
-      "en": "Quiet, gloomy pirate, speaking almost in a whisper, slow and sparing, suspicious and cool. Speak English.",
-      "pl": "Cichy, ponury pirat, mówi prawie szeptem, powoli, oszczędnie, podejrzliwy i chłodny. Mów po polsku."
+      "en": "Calm, low, matter-of-fact voice, few words, polite but firm brush-offs, a touch bored, cautious, never raises his voice. Speak English.",
+      "pl": "Spokojny, niski, rzeczowy głos, mało słów, grzecznie, ale stanowczo zbywa, trochę znudzony, ostrożny, nigdy nie podnosi głosu. Mów po polsku."
     }
   },
   "sample_lines": {

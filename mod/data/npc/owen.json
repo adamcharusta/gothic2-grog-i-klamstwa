@@ -12,10 +12,11 @@
     "pl": "Cicho, ostrożnie, praktycznie."
   },
   "voice": {
-    "name": "ash",
+    "original": 13,
+    "name": "fable",
     "style": {
-      "en": "Calm, worried lumberjack, quiet and cautious, speaking slowly, concern in his voice. Speak English.",
-      "pl": "Spokojny, zmartwiony drwal, cichy i ostrożny, mówi powoli, w głosie troska. Mów po polsku."
+      "en": "Tired, worried lumberjack, quiet and earnest, sighs and complains about hard work, concern for his mate in his voice. Speak English.",
+      "pl": "Zmęczony, zatroskany drwal, mówi cicho i szczerze, wzdycha i narzeka na harówkę, w głosie troska o kumpla. Mów po polsku."
     }
   },
   "sample_lines": {

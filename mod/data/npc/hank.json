@@ -12,7 +12,8 @@
     "pl": "Sucho, sarkastycznie, narzeka."
   },
   "voice": {
-    "name": "ash",
+    "original": 6,
+    "name": "fable",
     "style": {
       "en": "Grumbling, sour pirate, flat sarcasm, complaining in a weary voice, slow tempo. Speak English.",
       "pl": "Zrzędzący, cierpki pirat, monotonny sarkazm, narzeka zmęczonym głosem, tempo wolne. Mów po polsku."

@@ -12,10 +12,11 @@
     "pl": "Ziewa, przeciąga słowa, kpiąco, krótko."
   },
   "voice": {
+    "original": 7,
     "name": "echo",
     "style": {
-      "en": "Sleepy, sarcastic pirate, yawning, drawling, lazy and mocking, low voice. Speak English.",
-      "pl": "Ospały, sarkastyczny pirat, ziewa, przeciąga słowa, leniwy i kpiący, cichy głos. Mów po polsku."
+      "en": "Sleepy, lazy crew boss, yawning and drawling, groggy until he has had a drink, heavy irony, puffs himself up. Speak English.",
+      "pl": "Zaspany, leniwy dowódca, ziewa i przeciąga słowa, otępiały, póki się nie napije, ciężka ironia, puszy się swoją ważnością. Mów po polsku."
     }
   },
   "sample_lines": {

@@ -12,10 +12,11 @@
     "pl": "Z rozmachem, opowieści z polowań, mówi do innych 'żółtodziobie'."
   },
   "voice": {
+    "original": 12,
     "name": "verse",
     "style": {
-      "en": "Confident, weathered middle-aged hunter, loud and boastful, telling tall tales with big gusto. Speak English.",
-      "pl": "Pewny siebie, zahartowany łowca w średnim wieku, głośny i przechwalający się, opowiada z rozmachem i zapałem. Mów po polsku."
+      "en": "Self-assured veteran hunter, relaxed and wry, colourful comparisons, boasts of old raids, dry warnings for greenhorns. Speak English.",
+      "pl": "Pewny siebie stary łowca, swobodny, mówi z przekąsem, barwne porównania, chwali się dawnymi abordażami, sucho ostrzega żółtodziobów. Mów po polsku."
     }
   },
   "sample_lines": {

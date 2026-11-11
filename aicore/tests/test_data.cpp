@@ -2,6 +2,7 @@
 
 #include <grog/ai/session.h>
 
+#include <map>
 #include <regex>
 #include <set>
 
@@ -51,9 +52,34 @@ TEST_CASE("every camp npc has a voice") {
     CHECK(endsWith(c.voice.style["en"], "Speak English."));
   }
   CHECK(d.cards.at("greg").voice.name == "onyx");
-  for(auto [a, b] : {std::pair{"angus", "hank"}, std::pair{"owen", "malcolm"}, std::pair{"greg", "francis"}}) {
-    CAPTURE(a);
-    CHECK(d.cards.at(a).voice.name != d.cards.at(b).voice.name);
+}
+
+TEST_CASE("cards carry the original voice number") {
+  GameData d = data();
+  const std::map<std::string, int> expected{
+      {"greg", 1},  {"francis", 13}, {"garett", 9},  {"samuel", 14},  {"alligator_jack", 12}, {"henry", 4},
+      {"morgan", 7}, {"bill", 3},    {"brandon", 4}, {"matt", 10},    {"owen", 13},           {"malcolm", 4},
+      {"skip", 8},  {"angus", 6},    {"hank", 6},    {"bones", 1}};
+  CHECK(d.cards.size() == expected.size());
+  for(auto& [id, original] : expected) {
+    CAPTURE(id);
+    REQUIRE(d.cards.count(id));
+    CHECK(d.cards.at(id).voice.original == original);
+  }
+}
+
+TEST_CASE("shared original actor means the same openai voice") {
+  // Only six male voices exist, so different actors may share a name; one actor never gets two.
+  GameData d = data();
+  std::map<int, std::string> byActor;
+  for(auto& [id, c] : d.cards) {
+    CAPTURE(id);
+    REQUIRE(c.voice.original > 0);
+    auto [it, fresh] = byActor.emplace(c.voice.original, c.voice.name);
+    if(!fresh) {
+      CAPTURE(c.voice.original);
+      CHECK(it->second == c.voice.name);
+    }
   }
 }
 

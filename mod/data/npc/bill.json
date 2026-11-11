@@ -12,10 +12,11 @@
     "pl": "Szybko, z przejęciem, przechwala się, zadaje pytania."
   },
   "voice": {
+    "original": 3,
     "name": "ash",
     "style": {
-      "en": "Young, excited pirate, fast tempo, cheeky and a little naive, still a boyish voice. Speak English.",
-      "pl": "Młody, podekscytowany pirat, szybkie tempo, zadziorny i trochę naiwny, głos jeszcze chłopięcy. Mów po polsku."
+      "en": "Young, hot-headed pirate, quick and touchy, blunt insults when annoyed, flares up easily, keen not to look lazy. Speak English.",
+      "pl": "Młody, porywczy pirat, szybki i drażliwy, zirytowany rzuca dosadne epitety, łatwo wybucha, nie chce wyjść na lenia. Mów po polsku."
     }
   },
   "sample_lines": {

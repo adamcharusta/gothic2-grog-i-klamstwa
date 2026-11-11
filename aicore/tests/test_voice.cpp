@@ -42,13 +42,15 @@ struct VoiceFx {
   Telemetry tel;
   TempDir cache;
   std::unique_ptr<GameSession> s;
-  explicit VoiceFx(bool voiceOn = true, Pricing p = Pricing{}) : tel(log, false, std::move(p)) {
+  explicit VoiceFx(bool voiceOn = true, Pricing p = Pricing{}, TtsVoices voices = TtsVoices::OpenAi)
+      : tel(log, false, std::move(p)) {
     auto d = loadGameData(pathFromUtf8(std::string(GROG_REPO_ROOT) + "/mod/data"));
     REQUIRE(d.ok());
     AiConfig cfg;
     cfg.tts.kind = TtsKind::OpenAiCompatible;
     cfg.tts.apiKey = "sk-tts-SECRET";
     cfg.tts.cacheDir = pathToUtf8(cache.path);
+    cfg.tts.voices = voices;
     s = std::make_unique<GameSession>(cfg, d.value(), actor, director, tel, 8);
     if(voiceOn)
       s->setTts(&tts);
@@ -233,6 +235,42 @@ TEST_CASE("voice: an npc without a voice uses the default") {
   REQUIRE(f.tts.requests.size() == 1);
   CHECK(f.tts.requests[0].voice == "ash");
   CHECK(f.tts.requests[0].instructions.empty());
+}
+
+TEST_CASE("voice: voices=original sends the npc id and no instructions") {
+  VoiceFx orig(true, Pricing{}, TtsVoices::Original);
+  CHECK(isWav(orig.s->speakAsync("greg", "Spadaj.", false).get().audioWav));
+  REQUIRE(orig.tts.requests.size() == 1);
+  CHECK(orig.tts.requests[0].voice == "greg");
+  CHECK(orig.tts.requests[0].instructions.empty());
+  CHECK(orig.tts.requests[0].text == "Spadaj.");
+
+  VoiceFx def;
+  CHECK(isWav(def.s->speakAsync("greg", "Spadaj.", false).get().audioWav));
+  REQUIRE(def.tts.requests.size() == 1);
+  CHECK(def.tts.requests[0].voice == "onyx");
+  CHECK(def.tts.requests[0].instructions == def.s->data().cards.at("greg").voice.style.at("pl"));
+}
+
+TEST_CASE("voice: original-mode cache keys differ from openai-mode keys") {
+  VoiceFx f;
+  REQUIRE(isWav(f.s->speakAsync("greg", "Spadaj.", true).get().audioWav));
+  // A second session in original mode shares the same cache directory.
+  AiConfig cfg;
+  cfg.tts.kind = TtsKind::OpenAiCompatible;
+  cfg.tts.cacheDir = pathToUtf8(f.cache.path);
+  cfg.tts.voices = TtsVoices::Original;
+  MockTts tts2;
+  GameSession s2(cfg, f.s->data(), f.actor, f.director, f.tel, 8);
+  s2.setTts(&tts2);
+  REQUIRE(isWav(s2.speakAsync("greg", "Spadaj.", true).get().audioWav));
+  CHECK(tts2.requests.size() == 1);  // not served from the openai-mode file
+  int files = 0;
+  for(auto& e : fs::directory_iterator(f.cache.path)) {
+    (void)e;
+    ++files;
+  }
+  CHECK(files == 2);
 }
 
 namespace {

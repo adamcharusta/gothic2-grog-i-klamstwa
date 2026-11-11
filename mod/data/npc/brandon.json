@@ -12,10 +12,11 @@
     "pl": "Burczy, prosto z mostu, mało słów."
   },
   "voice": {
-    "name": "onyx",
+    "original": 4,
+    "name": "ballad",
     "style": {
-      "en": "Grumpy, tired labourer, low gruff voice, grumbling under his breath, short and curt. Speak English.",
-      "pl": "Zrzędliwy, zmęczony robotnik, niski szorstki głos, burczy pod nosem, krótko i opryskliwie. Mów po polsku."
+      "en": "Rough, hearty pirate, gruff banter, teases newcomers, short blunt answers, a loud pleased grunt over good grog. Speak English.",
+      "pl": "Szorstki, krzepki pirat, rubaszne docinki, dogaduje nowym, odpowiada krótko i dosadnie, głośno sapie z zadowolenia nad dobrym grogiem. Mów po polsku."
     }
   },
   "sample_lines": {

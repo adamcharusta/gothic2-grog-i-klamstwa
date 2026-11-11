@@ -12,6 +12,7 @@
     "pl": "Dużo się śmieje, podśpiewuje szanty, klepie po plecach."
   },
   "voice": {
+    "original": 6,
     "name": "fable",
     "style": {
       "en": "Loud, jolly pirate, chatty and laughing a lot, lively tempo, slightly tipsy, sometimes breaking into song. Speak English.",

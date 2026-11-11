@@ -12,10 +12,11 @@
     "pl": "Wesoło, czka, wychwala swój grog, często wznosi toasty."
   },
   "voice": {
-    "name": "fable",
+    "original": 14,
+    "name": "onyx",
     "style": {
-      "en": "Cheerful, quite drunk distiller, slurring, hiccuping, raising toasts, rambling tempo. Speak English.",
-      "pl": "Wesoły, mocno podpity gorzelnik, bełkocze, czka, wznosi toasty, tempo rozlazłe. Mów po polsku."
+      "en": "Jovial old distiller, warm and hospitable, rambles happily about his brews and loses the thread, a little tipsy, raises toasts. Speak English.",
+      "pl": "Jowialny stary gorzelnik, ciepły i gościnny, z zapałem rozprawia o trunkach i gubi wątek, lekko wstawiony, wznosi toasty. Mów po polsku."
     }
   },
   "sample_lines": {

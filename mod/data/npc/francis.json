@@ -12,10 +12,11 @@
     "pl": "Gładko, trochę napuszenie, fałszywa uprzejmość; lubi wydawać polecenia."
   },
   "voice": {
-    "name": "echo",
+    "original": 13,
+    "name": "fable",
     "style": {
-      "en": "Pompous, vain pirate, smooth and condescending, fake friendliness, slow and affected tempo. Speak English.",
-      "pl": "Wyniosły, nadęty pirat, gładki i protekcjonalny, udawana serdeczność, tempo wolne i wystudiowane. Mów po polsku."
+      "en": "Blustering, self-important pirate, indignant outbursts and empty threats, loud while he feels safe, stammers and wheedles when pressed. Speak English.",
+      "pl": "Napuszony ważniak, oburzone wykrzyknienia i puste groźby, głośny, póki czuje się bezpiecznie, przyciśnięty jąka się i przymila. Mów po polsku."
     }
   },
   "sample_lines": {

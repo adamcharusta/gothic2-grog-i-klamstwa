@@ -656,7 +656,10 @@ GameSession::Voiced GameSession::voice(const std::string& npc, const std::string
   TtsRequest req;
   req.text = text;
   req.voice = "ash";
-  if(auto it = data_.cards.find(npc); it != data_.cards.end()) {
+  if(config_.tts.voices == TtsVoices::Original) {
+    // A local cloning server picks the reference clip by NPC id; its clone carries the manner.
+    req.voice = npc;
+  } else if(auto it = data_.cards.find(npc); it != data_.cards.end()) {
     const NpcVoice& nv = it->second.voice;
     if(!nv.name.empty())
       req.voice = nv.name;

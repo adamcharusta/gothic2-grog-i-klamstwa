@@ -196,6 +196,13 @@ Result<AiConfig> parseConfig(std::string_view iniText, const EnvLookup& env) {
     }
     if(auto d = get(m, "tts.cache_dir"); !d.empty())
       c.tts.cacheDir = d;
+    std::string voices = lower(get(m, "tts.voices"));
+    if(voices.empty() || voices == "openai")
+      c.tts.voices = TtsVoices::OpenAi;
+    else if(voices == "original")
+      c.tts.voices = TtsVoices::Original;
+    else
+      return configError("unknown [tts] voices '" + voices + "' (expected openai or original)");
   } else {
     return configError("unknown [tts] provider '" + ttsProvider + "' (expected off or openai_compatible)");
   }

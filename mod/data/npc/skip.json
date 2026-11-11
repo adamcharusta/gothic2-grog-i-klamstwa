@@ -12,10 +12,11 @@
     "pl": "Rozwlekle, skacze z tematu na temat, dużo 'no wiesz...' i 'bo widzisz...', narzeka na robotę."
   },
   "voice": {
+    "original": 8,
     "name": "verse",
     "style": {
-      "en": "Nervous, talkative pirate, fast tempo, stammering and rambling, pleading tone, frightened. Speak English.",
-      "pl": "Nerwowy, gadatliwy pirat, szybkie tempo, jąka się i plącze, błagalny ton, wystraszony. Mów po polsku."
+      "en": "Talkative old sailor, quick and restless, curses \"damn it\" often, swaggers one moment and frets the next, jumps between topics. Speak English.",
+      "pl": "Gadatliwy stary żeglarz, szybki i niespokojny, często rzuca „niech to diabli”, to się przechwala, to martwi, skacze z tematu na temat. Mów po polsku."
     }
   },
   "sample_lines": {

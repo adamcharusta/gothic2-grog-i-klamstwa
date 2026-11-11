@@ -12,10 +12,11 @@
     "pl": "Wykrzykiwane rozkazy, krótkie zdania, marynarskie przekleństwa, mówi do gracza 'chłopcze' albo 'szczurze lądowy'. Nigdy uprzejmy."
   },
   "voice": {
+    "original": 1,
     "name": "onyx",
     "style": {
-      "en": "Hoarse, loud old pirate captain, short-tempered, slightly drunk, barking orders. Speak English.",
-      "pl": "Chrapliwy, głośny stary kapitan piratów, porywczy, lekko podpity, szczeka rozkazy. Mów po polsku."
+      "en": "Gruff, hoarse old captain, low and curt, dry scorn and open threats, sudden barked shouts, calls you landlubber. Speak English.",
+      "pl": "Szorstki, chrapliwy stary kapitan, nisko i krótko, sucha pogarda i otwarte groźby, nagle wrzaśnie, mówi „szczurze lądowy”. Mów po polsku."
     }
   },
   "sample_lines": {

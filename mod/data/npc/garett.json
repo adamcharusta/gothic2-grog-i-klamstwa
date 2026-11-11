@@ -12,10 +12,11 @@
     "pl": "Rzeczowo, liczy w złocie, krótko i sucho."
   },
   "voice": {
-    "name": "ballad",
+    "original": 9,
+    "name": "ash",
     "style": {
-      "en": "Businesslike middle-aged quartermaster, dry and even tone, little emotion, always counting. Speak English.",
-      "pl": "Rzeczowy kwatermistrz w średnim wieku, suchy, spokojny i rzeczowy ton, bez emocji, liczy w myślach. Mów po polsku."
+      "en": "Easygoing quartermaster, even and businesslike, a trader's patter, gossips in a lowered voice, sighs when grumbling about the captain. Speak English.",
+      "pl": "Swobodny kwatermistrz, równy, rzeczowy ton, kupiecka gadka, plotkuje ściszonym głosem, wzdycha, gdy narzeka na kapitana. Mów po polsku."
     }
   },
   "sample_lines": {

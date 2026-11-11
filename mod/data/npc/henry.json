@@ -12,10 +12,11 @@
     "pl": "Krótko, rozkazująco, odpowiada pytaniami."
   },
   "voice": {
+    "original": 4,
     "name": "ballad",
     "style": {
-      "en": "Stern, disciplined guard commander, firm and sharp, clipped commands, distrustful tone. Speak English.",
-      "pl": "Surowy, zdyscyplinowany dowódca straży, stanowczy i ostry, krótkie komendy, nieufny ton. Mów po polsku."
+      "en": "Wary palisade commander, firm and curt, challenges strangers, haggles slyly, grumbles impatiently about delays. Speak English.",
+      "pl": "Czujny dowódca palisady, stanowczy i zwięzły, zaczepia obcych, chytrze się targuje, niecierpliwie zrzędzi na opóźnienia. Mów po polsku."
     }
   },
   "sample_lines": {

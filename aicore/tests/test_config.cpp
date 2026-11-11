@@ -167,6 +167,24 @@ TEST_CASE("unknown tts provider is a config error") {
   CHECK(r.error().message.find("tts") != std::string::npos);
 }
 
+TEST_CASE("voices config") {
+  const std::string base =
+      "[ai]\nprovider = mock\n[tts]\nprovider = openai_compatible\nbase_url = http://x/v1\napi_key = sk-t\n";
+  auto def = parseConfig(base, noEnv());
+  REQUIRE(def.ok());
+  CHECK(def.value().tts.voices == TtsVoices::OpenAi);
+  auto openai = parseConfig(base + "voices = OpenAI\n", noEnv());
+  REQUIRE(openai.ok());
+  CHECK(openai.value().tts.voices == TtsVoices::OpenAi);
+  auto orig = parseConfig(base + "voices = original\n", noEnv());
+  REQUIRE(orig.ok());
+  CHECK(orig.value().tts.voices == TtsVoices::Original);
+  auto bad = parseConfig(base + "voices = cloned\n", noEnv());
+  REQUIRE_FALSE(bad.ok());
+  CHECK(bad.error().message.find("[tts] voices") != std::string::npos);
+  CHECK(bad.error().message.find("sk-t") == std::string::npos);
+}
+
 TEST_CASE("tts timeout_s is clamped to 5..60") {
   auto lo = parseConfig("[ai]\nprovider = mock\n[tts]\nprovider = openai_compatible\nbase_url = http://x/v1\ntimeout_s = 1\n",
                         noEnv());
