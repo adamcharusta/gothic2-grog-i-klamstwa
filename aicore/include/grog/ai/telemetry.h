@@ -31,8 +31,9 @@ class Telemetry {
   Telemetry(std::ostream& out, bool logContent, Pricing pricing);
 
   void session(const Scenario& scenario, const AiConfig& config);
-  void request(std::string_view role, std::string_view npc, std::string_view provider, const Result<LlmReply>& reply,
-               std::string_view requestText);
+  // Returns the estimated cost in USD (0 when the request failed or the model has no price).
+  double request(std::string_view role, std::string_view npc, std::string_view provider, const Result<LlmReply>& reply,
+                 std::string_view requestText);
   void verdicts(std::string_view speaker, const std::vector<Verdict>& verdicts);
   void event(std::string_view kind, const nlohmann::json& data);
 

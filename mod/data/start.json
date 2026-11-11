@@ -1,12 +1,1 @@
-{
-  "schema": 1,
-  "world": "ADDONWORLD.ZEN",
-  "waypoint": "ADW_PIRATECAMP_CENTER",
-  "armor": "ITAR_PIR_L_ADDON",
-  "level": 10,
-  "items": {
-    "ITMW_ADDON_PIR1HSWORD": 1,
-    "ITMI_GOLD": 50,
-    "ITFO_BOOZE": 2
-  }
-}
+{"schema":1,"world":"ADDONWORLD.ZEN","waypoint":"ADW_PIRATECAMP_CENTER","armor":"ITAR_PIR_L_ADDON","level":10,"items":{"ITMW_ADDON_PIR1HSWORD":1,"ITMI_GOLD":50,"ITFO_BOOZE":2},"first_quest":{"pl":"Porozmawiaj z Gregiem. Kapitan stoi przed swoją chatą w obozie i podobno ma dla mnie robotę.","en":"Talk to Greg. The captain stands in front of his hut in the camp and seems to have a job for me."}}

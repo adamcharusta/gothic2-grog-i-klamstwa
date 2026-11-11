@@ -1,0 +1,4 @@
+{"kind":"session","seed":222,"provider":"openai_compatible","actor_model":"gpt-4.1-mini","director_model":"gpt-4.1-mini","language":"pl","t":0}
+{"kind":"request","role":"actor","npc":"greg","provider":"openai_compatible","ok":true,"model":"gpt-4.1-mini-2025-04-14","input_tokens":1000,"output_tokens":100,"latency_ms":2000.0,"t":10}
+{"kind":"summary","seed":222,"outcome":"returned","play_time_s":1800}
+{"kind":"request","role":"actor","npc":"greg","provider":"openai_compatible","ok":true,"model":"gpt-4.1-mini-2025-04-14","input_tok

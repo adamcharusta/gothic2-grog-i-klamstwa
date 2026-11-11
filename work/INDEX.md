@@ -16,3 +16,5 @@ One row per task. Details in the report file. Template: [_TEMPLATE.md](_TEMPLATE
 | 0010 | 2026-11-07 | partial | Engine vertical slice: AI dialogue in game (playtest pending) | [0010-engine-slice.md](0010-engine-slice.md) |
 | 0011 | 2026-11-07 | partial | Campaign logic: endings, fights, director, save/load (playtest pending) | [0011-campaign-logic.md](0011-campaign-logic.md) |
 | 0012 | 2026-11-11 | partial | Fixes from the first playtest (CI build + playtest 2 pending) | [0012-playtest1-fixes.md](0012-playtest1-fixes.md) |
+| 0013 | 2026-11-11 | partial | Failure handling, benchmark script, README provider guides (playtest 2 + release pending) | [0013-plan5-release-prep.md](0013-plan5-release-prep.md) |
+| 0014 | 2026-11-11 | partial | Playtest 2: cast starting places, NPC hangouts, camera snap, log entry notice (in-game check pending) | [0014-playtest2-cast-places.md](0014-playtest2-cast-places.md) |

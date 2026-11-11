@@ -59,4 +59,7 @@ std::unique_ptr<ILlmProvider> makeProvider(const ProviderConfig& config, IHttpCl
 // Instruction text appended to the system prompt describing the reply schema.
 std::string schemaInstruction(const nlohmann::json& schema);
 
+// OpenAI reasoning models (o1/o3/o4, gpt-5*): they take max_completion_tokens and no temperature.
+bool isReasoningModel(std::string_view model);
+
 }  // namespace grog::ai

@@ -1,5 +1,7 @@
 #include <doctest/doctest.h>
 
+#include <algorithm>
+
 #include <grog/ai/cards.h>
 #include <grog/ai/prompt.h>
 
@@ -125,4 +127,21 @@ TEST_CASE("language instruction, memory window and Polish bytes") {
 
   auto en = buildActorRequest(card("greg"), w, cast, lore(), Language::En, "Hi", rules());
   CHECK(en.system.find("Always reply in English") != std::string::npos);
+}
+
+TEST_CASE("playtest 2: everyone knows where the camp members usually are") {
+  Cast cast = testCast();
+  for(auto& m : cast.npcs) {
+    INFO(m.id);
+    CHECK_FALSE(m.hangout["pl"].empty());
+    CHECK_FALSE(m.hangout["en"].empty());
+  }
+  auto malcolm = std::find_if(cast.npcs.begin(), cast.npcs.end(), [](auto& m) { return m.id == "malcolm"; });
+  REQUIRE(malcolm != cast.npcs.end());
+  WorldState w = WorldState::fromScenario(rollScenario(4, cast), cast);
+  auto pl = buildActorRequest(card("greg"), w, cast, lore(), Language::Pl, "Gdzie jest Malcolm?", rules());
+  CHECK(pl.system.find("# Where people usually are") != std::string::npos);
+  CHECK(pl.system.find("- Malcolm: " + malcolm->hangout.at("pl")) != std::string::npos);
+  auto dir = buildDirectorRequest(w, cast, lore(), "tick", testutil::repoFile("mod/data/rules/director.md"));
+  CHECK(dir.system.find("- malcolm: " + malcolm->hangout.at("en")) != std::string::npos);
 }

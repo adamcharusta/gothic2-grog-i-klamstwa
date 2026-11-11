@@ -15,6 +15,13 @@ Owen, Malcolm, Skip, Angus, Hank, Bones, plus any unnamed camp pirates.
 
 [B] Verify the full list by NPC instances in scripts (e.g. `PIR_xxxx_Addon_*`) and record it in the mod data.
 
+[B] Starting places (checked in the original `GOTHIC.DAT`, playtest 2): all cast members are inserted by the original
+startup, but some start far away and are not simulated there, so they never walk to the player. Malcolm stands alone at
+the lumber camp outside the palisade (his partner Owen drinks on the beach), Angus and Hank stand in the waterhole cave,
+and Alligator Jack waits on the path to the camp. `cast.json` `routine` gives them a camp routine on a new game (Owen and
+Malcolm get their original lumberjack pair routines `RTN_PRESTART_1367/1368`). Each cast member also has a `hangout`
+text (PL/EN) that goes into the actor and director prompts, so the AI sends the player to the right place.
+
 [P] No bandits, Water Mages, far-away monsters or other NPCs. Exception: monsters spawned by events (see [03](03-game-master.md)).
 
 ## Character cards (data, not code) [P]

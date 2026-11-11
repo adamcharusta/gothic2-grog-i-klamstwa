@@ -1,6 +1,8 @@
 #include <grog/ai/io.h>
 #include <grog/ai/session.h>
 
+#include <grog/ai/hints.h>
+
 #include <algorithm>
 
 namespace grog::ai {
@@ -125,6 +127,13 @@ Result<GameData> loadGameData(const fs::path& dir) {
       d.start.items.push_back({inst, n.get<int>()});
     }
   }
+  if(sj.contains("first_quest")) {
+    if(!sj["first_quest"].is_object())
+      return Error{ErrorKind::Io, "start.json: 'first_quest' must be an object {pl: text, en: text}"};
+    for(auto& [lang, text] : sj["first_quest"].items())
+      if(text.is_string() && !text.get<std::string>().empty())
+        d.start.firstQuest[lang] = text.get<std::string>();
+  }
 
   if(fs::exists(dir / "pricing.json")) {
     auto pj = readJson(dir / "pricing.json");
@@ -151,6 +160,9 @@ GameSession::GameSession(AiConfig config, GameData data, ILlmProvider& actor, IL
     for(auto& item : card.items)
       if(!world_.itemHolder.count(item))
         world_.itemHolder[item] = id;
+  // New game: tell the player where to start. A loaded save replaces the whole world state.
+  if(auto it = data_.start.firstQuest.find(languageName(config_.language)); it != data_.start.firstQuest.end())
+    world_.quests.push_back({"tankard", it->second, 0});
   telemetry_.session(world_.scenario, config_);
 }
 
@@ -187,12 +199,21 @@ TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLi
 
   // Provider call without holding the lock.
   std::optional<ActorReply> reply;
+  bool retriedTransport = false;
   for(int attempt = 0; attempt < 2 && !reply; ++attempt) {
     auto res = actor_.complete(req);
-    telemetry_.request("actor", npc, actor_.id(), res, playerLine);
+    record("actor", npc, actor_, res, playerLine);
     if(!res.ok()) {
       out.error = res.error();
-      break;  // provider errors are not retried here (cost, rate limits)
+      // One retry for passing trouble; key, quota and config errors would only fail again (and may cost money).
+      const ErrorKind k = res.error().kind;
+      const bool transient = k == ErrorKind::Timeout || k == ErrorKind::Server || k == ErrorKind::Network;
+      if(transient && !retriedTransport) {
+        retriedTransport = true;
+        --attempt;  // does not use up the bad-reply retry
+        continue;
+      }
+      break;
     }
     auto parsed = parseActorReply(res.value().text);
     if(!parsed.ok()) {
@@ -222,6 +243,7 @@ TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLi
       auto verdicts = validate(reply->actions, npc, world_, data_.cast, gameTimeS);
       for(auto& v : verdicts)
         stats_.rejected += v.accepted ? 0 : 1;
+      stats_.verdicts += static_cast<int>(verdicts.size());
       WorldState next = world_;
       apply(verdicts, npc, next, gameTimeS);
       auto& mem = next.npcs[npc].memory;
@@ -243,6 +265,11 @@ TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLi
   }
   ++stats_.fallbacks;
   out.usedFallback = true;
+  if(out.error && !hinted_.count(out.error->kind)) {
+    out.hint = playerHint(out.error->kind, config_.language);
+    if(!out.hint.empty())
+      hinted_.insert(out.error->kind);
+  }
   out.speech = fallbackLine(*card);
   out.gesture = "think";
   telemetry_.event("fallback", {{"npc", npc}, {"reason", out.error ? errorKindName(out.error->kind) : "unknown"}});
@@ -266,7 +293,7 @@ DirectorResult GameSession::direct(std::string_view trigger, int64_t gameTimeS) 
     req = buildDirectorRequest(world_, data_.cast, data_.lore, trigger, data_.directorRules, config_.language);
   }
   auto res = director_.complete(req);
-  telemetry_.request("director", "", director_.id(), res, trigger);
+  record("director", "", director_, res, trigger);
   if(!res.ok()) {
     out.error = res.error();
     return out;
@@ -288,6 +315,9 @@ DirectorResult GameSession::direct(std::string_view trigger, int64_t gameTimeS) 
     WorldState next = world_;
     next.rollEventHour(gameTimeS);
     auto verdicts = validate(actions, kDirector, next, data_.cast, gameTimeS);
+    for(auto& v : verdicts)
+      stats_.rejected += v.accepted ? 0 : 1;
+    stats_.verdicts += static_cast<int>(verdicts.size());
     apply(verdicts, kDirector, next, gameTimeS);
     world_ = std::move(next);
     out.verdicts = std::move(verdicts);
@@ -297,6 +327,20 @@ DirectorResult GameSession::direct(std::string_view trigger, int64_t gameTimeS) 
     out.error = Error{ErrorKind::BadResponse, std::string("director reply could not be applied: ") + e.what()};
   }
   return out;
+}
+
+void GameSession::record(std::string_view role, std::string_view npc, const ILlmProvider& p,
+                         const Result<LlmReply>& res, std::string_view requestText) {
+  double cost = telemetry_.request(role, npc, p.id(), res, requestText);
+  std::lock_guard<std::mutex> lock(mu_);
+  ++stats_.requests;
+  if(!res.ok())
+    return;
+  stats_.costUsd += cost;
+  stats_.inputTokens += res.value().inputTokens;
+  stats_.outputTokens += res.value().outputTokens;
+  stats_.latencySumMs += res.value().latencyMs;
+  stats_.latencyMaxMs = std::max(stats_.latencyMaxMs, res.value().latencyMs);
 }
 
 void GameSession::translateItems(std::vector<Command>& actions) const {
@@ -408,6 +452,16 @@ nlohmann::json GameSession::summary() {
           {"fallbacks", stats_.fallbacks},
           {"director_calls", stats_.directorCalls},
           {"rejected_commands", stats_.rejected},
+          {"rejected_rate", stats_.verdicts ? double(stats_.rejected) / stats_.verdicts : 0.0},
+          {"requests", stats_.requests},
+          {"input_tokens", stats_.inputTokens},
+          {"output_tokens", stats_.outputTokens},
+          {"cost_usd", stats_.costUsd},
+          {"latency_ms_avg", stats_.requests ? stats_.latencySumMs / stats_.requests : 0.0},
+          {"latency_ms_max", stats_.latencyMaxMs},
+          {"provider", providerKindName(config_.actor.kind)},
+          {"model", config_.actor.model},
+          {"director_model", config_.director.model},
           {"quest_entries", world_.quests.size()}};
 }
 
@@ -422,6 +476,13 @@ nlohmann::json GameSession::saveState() {
             {"fallbacks", stats_.fallbacks},
             {"director_calls", stats_.directorCalls},
             {"rejected", stats_.rejected},
+            {"verdicts", stats_.verdicts},
+            {"requests", stats_.requests},
+            {"input_tokens", stats_.inputTokens},
+            {"output_tokens", stats_.outputTokens},
+            {"cost_usd", stats_.costUsd},
+            {"latency_sum_ms", stats_.latencySumMs},
+            {"latency_max_ms", stats_.latencyMaxMs},
             {"play_time_s", lastGameT_}}}};
 }
 
@@ -443,6 +504,14 @@ Result<bool> GameSession::loadState(const nlohmann::json& j) {
     stats_.fallbacks = st.at("fallbacks").get<int>();
     stats_.directorCalls = st.at("director_calls").get<int>();
     stats_.rejected = st.at("rejected").get<int>();
+    // Added in Plan 5; saves from beta.5/6 lack them.
+    stats_.verdicts = st.value("verdicts", 0);
+    stats_.requests = st.value("requests", 0);
+    stats_.inputTokens = st.value("input_tokens", 0LL);
+    stats_.outputTokens = st.value("output_tokens", 0LL);
+    stats_.costUsd = st.value("cost_usd", 0.0);
+    stats_.latencySumMs = st.value("latency_sum_ms", 0.0);
+    stats_.latencyMaxMs = st.value("latency_max_ms", 0.0);
     lastGameT_ = st.at("play_time_s").get<int64_t>();
     directorInFlight_ = false;
     ++generation_;

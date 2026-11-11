@@ -1,0 +1,6 @@
+{"kind":"session","seed":111,"provider":"openai_compatible","actor_model":"gpt-4.1-mini","director_model":"gpt-4.1-mini","language":"pl","t":0}
+{"kind":"request","role":"actor","npc":"greg","provider":"openai_compatible","ok":true,"model":"gpt-4.1-mini-2025-04-14","input_tokens":1000,"output_tokens":100,"latency_ms":1000.0,"cost_usd":0.00056,"t":10}
+{"kind":"verdicts","speaker":"greg","verdicts":[{"type":"attitude","args":{"delta":-1},"accepted":true,"reason":""},{"type":"quest_entry","args":{},"accepted":false,"reason":"empty text"}],"t":10}
+{"kind":"request","role":"actor","npc":"matt","provider":"openai_compatible","ok":false,"error":"timeout","error_message":"timed out","t":20}
+{"kind":"fallback","npc":"matt","reason":"timeout","t":20}
+{"kind":"request","role":"director","npc":"","provider":"openai_compatible","ok":true,"model":"gpt-4.1-mini-2025-04-14","input_tokens":2000,"output_tokens":200,"latency_ms":3000.0,"cost_usd":0.00112,"t":30}

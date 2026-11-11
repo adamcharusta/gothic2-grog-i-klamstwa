@@ -108,6 +108,13 @@ LlmRequest buildActorRequest(const NpcCard& card, const WorldState& w, const Cas
     for(auto& [id, rel] : card.relations)
       sys << "- " << cast.displayName(id) << ": " << rel << "\n";
   }
+  sys << "\n# Where people usually are\n"
+         "Only send the player where people really are. Do not invent other places for them.\n";
+  for(auto& m : cast.npcs) {
+    auto it = m.hangout.find(languageName(lang));
+    if(it != m.hangout.end() && m.id != card.id)
+      sys << "- " << m.name << ": " << it->second << "\n";
+  }
   if(!card.persuasion.empty())
     sys << "\n# What can change your mind\n" << card.persuasion << "\n";
 
@@ -207,6 +214,10 @@ LlmRequest buildDirectorRequest(const WorldState& w, const Cast& cast, const Lor
   sys << "\nNPC ids:";
   for(auto& m : cast.npcs)
     sys << " " << m.id;
+  sys << "\nWhere NPCs usually are (an NPC far from the player needs a while to walk over):\n";
+  for(auto& m : cast.npcs)
+    if(m.hangout.count("en"))
+      sys << "- " << m.id << ": " << m.hangout.at("en") << "\n";
   sys << "\nNPCs who approached the player recently (game seconds; do not send them again soon):";
   for(auto& [id, t] : w.lastApproachS)
     sys << " " << id << "@" << t;

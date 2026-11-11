@@ -1,5 +1,7 @@
 #include <grog/ai/llm.h>
 
+#include <algorithm>
+#include <cctype>
 #include <chrono>
 
 namespace grog::ai {
@@ -22,6 +24,19 @@ double msSince(Clock::time_point t0) {
 }
 
 // Maps an HTTP status to an error. The provider body is NOT copied into the message (it may echo the key).
+}  // namespace
+
+bool isReasoningModel(std::string_view model) {
+  std::string m(model);
+  std::transform(m.begin(), m.end(), m.begin(), [](unsigned char c) { return char(std::tolower(c)); });
+  for(const char* p : {"o1", "o3", "o4", "gpt-5"})
+    if(m.rfind(p, 0) == 0)
+      return true;
+  return false;
+}
+
+namespace {
+
 Error statusError(int status, std::string_view provider) {
   std::string p(provider);
   if(status == 401 || status == 403)
@@ -30,6 +45,8 @@ Error statusError(int status, std::string_view provider) {
     return {ErrorKind::RateLimit, p + ": rate limit or quota exceeded (HTTP 429)"};
   if(status >= 500)
     return {ErrorKind::Server, p + ": provider server error (HTTP " + std::to_string(status) + ")"};
+  if(status == 400 || status == 404)  // unknown model, unsupported parameter, wrong base_url path
+    return {ErrorKind::Config, p + ": request rejected, check model and base_url (HTTP " + std::to_string(status) + ")"};
   return {ErrorKind::BadResponse, p + ": request rejected (HTTP " + std::to_string(status) + ")"};
 }
 
@@ -92,11 +109,14 @@ class OpenAiCompatibleProvider : public ILlmProvider {
     msgs.push_back({{"role", "system"}, {"content", req.system + "\n\n" + schemaInstruction(req.replySchema)}});
     for(auto& m : chatMessages(req))
       msgs.push_back(m);
-    json body = {{"model", cfg_.model},
-                 {"temperature", cfg_.temperature},
-                 {"max_tokens", req.maxTokens},
-                 {"messages", msgs},
-                 {"response_format", {{"type", "json_object"}}}};
+    json body = {{"model", cfg_.model}, {"messages", msgs}, {"response_format", {{"type", "json_object"}}}};
+    if(isReasoningModel(cfg_.model)) {
+      // Hidden reasoning tokens count against the limit; too small a limit gives an empty reply.
+      body["max_completion_tokens"] = std::max(req.maxTokens * 4, 2000);
+    } else {
+      body["temperature"] = cfg_.temperature;
+      body["max_tokens"] = req.maxTokens;
+    }
     HttpRequest hr{cfg_.baseUrl + "/chat/completions", {{"content-type", "application/json"}}, dumpSafe(body),
                    cfg_.timeoutS};
     if(!cfg_.apiKey.empty())

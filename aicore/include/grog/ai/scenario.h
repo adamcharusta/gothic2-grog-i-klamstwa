@@ -36,10 +36,21 @@ struct Scenario {
   std::vector<Clue> clues;
 };
 
+// Daily routine the engine forces on a new game, for cast members whose original routine keeps them
+// away from the camp. Either a script routine function, or one state at one waypoint all day.
+struct CastRoutine {
+  std::string function;  // e.g. RTN_PRESTART_1368
+  std::string state;     // e.g. ZS_SMALLTALK
+  std::string waypoint;  // used with `state`
+  bool empty() const { return function.empty() && state.empty(); }
+};
+
 struct CastMember {
   std::string id;
   std::string name;
   std::string instance;  // Gothic script instance, e.g. PIR_1320_ADDON_GREG
+  std::map<std::string, std::string> hangout;  // {pl,en}: where this NPC usually is (shown to the AI)
+  CastRoutine routine;
 };
 
 struct Cast {
