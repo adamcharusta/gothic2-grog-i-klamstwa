@@ -11,6 +11,13 @@
     "en": "Grumbling, blunt, few words.",
     "pl": "Burczy, prosto z mostu, mało słów."
   },
+  "voice": {
+    "name": "onyx",
+    "style": {
+      "en": "Grumpy, tired labourer, low gruff voice, grumbling under his breath, short and curt. Speak English.",
+      "pl": "Zrzędliwy, zmęczony robotnik, niski szorstki głos, burczy pod nosem, krótko i opryskliwie. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Can't you see I'm working?",

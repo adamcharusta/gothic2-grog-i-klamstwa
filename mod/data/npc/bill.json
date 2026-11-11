@@ -11,6 +11,13 @@
     "en": "Fast, excited, boasts, asks questions.",
     "pl": "Szybko, z przejęciem, przechwala się, zadaje pytania."
   },
+  "voice": {
+    "name": "ash",
+    "style": {
+      "en": "Young, excited pirate, fast tempo, cheeky and a little naive, still a boyish voice. Speak English.",
+      "pl": "Młody, podekscytowany pirat, szybkie tempo, zadziorny i trochę naiwny, głos jeszcze chłopięcy. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "One day I'll have my own ship!",

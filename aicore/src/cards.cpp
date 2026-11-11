@@ -39,6 +39,37 @@ bool readLines(const json& j, const char* key, LangLines& out, bool required, st
   return true;
 }
 
+bool readVoice(const json& j, NpcVoice& out, std::string& err) {
+  if(!j.contains("voice"))
+    return true;
+  const json& v = j["voice"];
+  if(!v.is_object()) {
+    err = "'voice' must be an object";
+    return false;
+  }
+  if(v.contains("name")) {
+    if(!v["name"].is_string()) {
+      err = "'voice.name' must be a string";
+      return false;
+    }
+    out.name = v["name"].get<std::string>();
+  }
+  if(v.contains("style")) {
+    if(!v["style"].is_object()) {
+      err = "'voice.style' must be an object";
+      return false;
+    }
+    for(auto& [lang, text] : v["style"].items()) {
+      if(!text.is_string()) {
+        err = "'voice.style." + lang + "' must be a string";
+        return false;
+      }
+      out.style[lang] = text.get<std::string>();
+    }
+  }
+  return true;
+}
+
 }  // namespace
 
 Result<NpcCard> loadCard(const json& j) {
@@ -53,7 +84,7 @@ Result<NpcCard> loadCard(const json& j) {
     return Error{ErrorKind::Io, "npc card: id and name are required"};
   if(!readText(j, "personality", c.personality, err) || !readText(j, "speech_style", c.speechStyle, err) ||
      !readLines(j, "sample_lines", c.sampleLines, false, err) || !readLines(j, "farewells", c.farewells, true, err) ||
-     !readLines(j, "fallback_lines", c.fallbackLines, true, err))
+     !readLines(j, "fallback_lines", c.fallbackLines, true, err) || !readVoice(j, c.voice, err))
     return Error{ErrorKind::Io, "npc card " + c.id + ": " + err};
   c.knowsAbout = j.value("knows_about", std::vector<std::string>{});
   c.relations = j.value("relations", std::map<std::string, std::string>{});

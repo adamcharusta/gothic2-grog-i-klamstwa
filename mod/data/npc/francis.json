@@ -11,6 +11,13 @@
     "en": "Smooth, a bit pompous, fake friendliness; likes giving orders.",
     "pl": "Gładko, trochę napuszenie, fałszywa uprzejmość; lubi wydawać polecenia."
   },
+  "voice": {
+    "name": "echo",
+    "style": {
+      "en": "Pompous, vain pirate, smooth and condescending, fake friendliness, slow and affected tempo. Speak English.",
+      "pl": "Wyniosły, nadęty pirat, gładki i protekcjonalny, udawana serdeczność, tempo wolne i wystudiowane. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "I kept this camp together while Greg was gone, you know.",

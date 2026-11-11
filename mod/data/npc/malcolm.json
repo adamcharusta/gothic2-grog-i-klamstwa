@@ -11,6 +11,13 @@
     "en": "Friendly, slow, chuckles.",
     "pl": "Przyjaźnie, powoli, podśmiewa się."
   },
+  "voice": {
+    "name": "fable",
+    "style": {
+      "en": "Cheerful, easygoing lumberjack, slow and warm, lazy and relaxed, chuckling often. Speak English.",
+      "pl": "Pogodny, spokojny drwal, mówi powoli i ciepło, rozleniwiony, często się chichocze. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "A short rest never hurt anyone.",

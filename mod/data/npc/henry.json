@@ -11,6 +11,13 @@
     "en": "Short, commanding, asks questions back.",
     "pl": "Krótko, rozkazująco, odpowiada pytaniami."
   },
+  "voice": {
+    "name": "ballad",
+    "style": {
+      "en": "Stern, disciplined guard commander, firm and sharp, clipped commands, distrustful tone. Speak English.",
+      "pl": "Surowy, zdyscyplinowany dowódca straży, stanowczy i ostry, krótkie komendy, nieufny ton. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Who let you in? State your business.",

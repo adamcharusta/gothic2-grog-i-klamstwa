@@ -11,6 +11,13 @@
     "en": "Big gestures, hunting stories, calls people 'greenhorn'.",
     "pl": "Z rozmachem, opowieści z polowań, mówi do innych 'żółtodziobie'."
   },
+  "voice": {
+    "name": "verse",
+    "style": {
+      "en": "Confident, weathered middle-aged hunter, loud and boastful, telling tall tales with big gusto. Speak English.",
+      "pl": "Pewny siebie, zahartowany łowca w średnim wieku, głośny i przechwalający się, opowiada z rozmachem i zapałem. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Once I wrestled a swampshark with my bare hands!",

@@ -11,6 +11,13 @@
     "en": "Quiet, cautious, practical.",
     "pl": "Cicho, ostrożnie, praktycznie."
   },
+  "voice": {
+    "name": "ash",
+    "style": {
+      "en": "Calm, worried lumberjack, quiet and cautious, speaking slowly, concern in his voice. Speak English.",
+      "pl": "Spokojny, zmartwiony drwal, cichy i ostrożny, mówi powoli, w głosie troska. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Careful out there, the woods aren't safe.",

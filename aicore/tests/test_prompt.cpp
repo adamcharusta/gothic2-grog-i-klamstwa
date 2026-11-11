@@ -53,6 +53,28 @@ TEST_CASE("cards load and reject missing required texts") {
   CHECK_FALSE(loadCard(j).ok());
 }
 
+TEST_CASE("cards load the voice") {
+  NpcCard greg = card("greg");
+  CHECK(greg.voice.name == "onyx");
+  CHECK_FALSE(greg.voice.style["en"].empty());
+  CHECK_FALSE(greg.voice.style["pl"].empty());
+}
+
+TEST_CASE("voice name is validated") {
+  json j = json::parse(testutil::repoFile("mod/data/npc/skip.json"));
+  j["voice"] = json{{"name", 5}};
+  CHECK_FALSE(loadCard(j).ok());
+  j["voice"] = json{{"name", "ash"}, {"style", json{{"en", 7}}}};
+  CHECK_FALSE(loadCard(j).ok());
+  j["voice"] = "ash";
+  CHECK_FALSE(loadCard(j).ok());
+  j.erase("voice");
+  auto c = loadCard(j);
+  REQUIRE(c.ok());
+  CHECK(c.value().voice.name.empty());
+  CHECK(c.value().voice.style.empty());
+}
+
 TEST_CASE("renderFact replaces ids with names and place names") {
   Cast cast = testCast();
   CHECK(renderFact("{alligator_jack} saw {greg} near {place:campfire}.", cast, Language::Pl) ==

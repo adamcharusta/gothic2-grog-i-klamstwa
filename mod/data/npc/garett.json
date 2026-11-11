@@ -11,6 +11,13 @@
     "en": "Businesslike, counts in gold, short and dry.",
     "pl": "Rzeczowo, liczy w złocie, krótko i sucho."
   },
+  "voice": {
+    "name": "ballad",
+    "style": {
+      "en": "Businesslike middle-aged quartermaster, dry and even tone, little emotion, always counting. Speak English.",
+      "pl": "Rzeczowy kwatermistrz w średnim wieku, suchy, spokojny i rzeczowy ton, bez emocji, liczy w myślach. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Everything has its price, mate.",

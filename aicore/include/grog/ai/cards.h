@@ -14,6 +14,13 @@ namespace grog::ai {
 using LangText = std::map<Language, std::string>;
 using LangLines = std::map<Language, std::vector<std::string>>;
 
+// TTS voice: an OpenAI voice name and a delivery instruction per language ("pl"/"en").
+// A card without a voice has an empty name (the session falls back to a default).
+struct NpcVoice {
+  std::string name;
+  std::map<std::string, std::string> style;
+};
+
 struct NpcCard {
   std::string id, name, campRole;
   LangText personality, speechStyle;
@@ -22,6 +29,7 @@ struct NpcCard {
   std::map<std::string, std::string> relations;  // npc id -> text
   std::string persuasion;
   std::vector<std::string> items;                // items the NPC starts with
+  NpcVoice voice;
 };
 
 struct Lore {

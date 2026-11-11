@@ -11,6 +11,13 @@
     "en": "Yawns, drawls, mocking, short.",
     "pl": "Ziewa, przeciąga słowa, kpiąco, krótko."
   },
+  "voice": {
+    "name": "echo",
+    "style": {
+      "en": "Sleepy, sarcastic pirate, yawning, drawling, lazy and mocking, low voice. Speak English.",
+      "pl": "Ospały, sarkastyczny pirat, ziewa, przeciąga słowa, leniwy i kpiący, cichy głos. Mów po polsku."
+    }
+  },
   "sample_lines": {
     "en": [
       "Wake me when it's important.",
