@@ -54,6 +54,7 @@ struct TurnResult {
   std::vector<Verdict> verdicts;
   std::optional<Error> error;  // set when the provider failed or the reply was unusable
   bool usedFallback = false;
+  std::string hint;            // UTF-8 player-facing hint, set the first time an error kind occurs (else empty)
 };
 
 struct Ending {
@@ -110,9 +111,14 @@ class GameSession {
   void translateItems(std::vector<Command>& actions) const;  // AI item handles -> internal ids
 
   struct Stats {
-    int turns = 0, fallbacks = 0, directorCalls = 0, rejected = 0;
+    int turns = 0, fallbacks = 0, directorCalls = 0, rejected = 0, verdicts = 0, requests = 0;
     long long inputTokens = 0, outputTokens = 0;
+    double costUsd = 0.0, latencySumMs = 0.0, latencyMaxMs = 0.0;
   };
+  // Logs the request and adds it to the stats. Takes mu_ itself.
+  void record(std::string_view role, std::string_view npc, const ILlmProvider& p, const Result<LlmReply>& res,
+              std::string_view requestText);
+  std::set<ErrorKind> hinted_;  // error kinds already explained to the player
 
   AiConfig config_;
   GameData data_;

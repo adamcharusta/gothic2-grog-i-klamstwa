@@ -110,7 +110,7 @@ TEST_CASE("provider errors map to distinct kinds without leaking the key") {
     ErrorKind kind;
   };
   for(auto c : {Case{401, ErrorKind::Auth}, Case{403, ErrorKind::Auth}, Case{429, ErrorKind::RateLimit},
-                Case{500, ErrorKind::Server}, Case{529, ErrorKind::Server}, Case{400, ErrorKind::BadResponse}}) {
+                Case{500, ErrorKind::Server}, Case{529, ErrorKind::Server}, Case{400, ErrorKind::Config}, Case{418, ErrorKind::BadResponse}}) {
     FakeHttp http;
     http.reply(c.status, std::string("{\"error\":{\"message\":\"echo ") + kKey + "\"}}");
     auto r = makeProvider(anthropicCfg(), http)->complete(sampleRequest());

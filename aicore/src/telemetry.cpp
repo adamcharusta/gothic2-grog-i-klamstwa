@@ -56,8 +56,9 @@ void Telemetry::session(const Scenario& s, const AiConfig& c) {
          {"language", languageName(c.language)}});
 }
 
-void Telemetry::request(std::string_view role, std::string_view npc, std::string_view provider,
-                        const Result<LlmReply>& reply, std::string_view requestText) {
+double Telemetry::request(std::string_view role, std::string_view npc, std::string_view provider,
+                          const Result<LlmReply>& reply, std::string_view requestText) {
+  double spent = 0.0;
   json l = {{"kind", "request"}, {"role", role}, {"npc", npc}, {"provider", provider}, {"ok", reply.ok()}};
   if(reply.ok()) {
     const LlmReply& r = reply.value();
@@ -66,7 +67,8 @@ void Telemetry::request(std::string_view role, std::string_view npc, std::string
     l["input_tokens"] = r.inputTokens;
     l["output_tokens"] = r.outputTokens;
     l["latency_ms"] = r.latencyMs;
-    l["cost_usd"] = cost < 0 ? 0.0 : cost;
+    spent = cost < 0 ? 0.0 : cost;
+    l["cost_usd"] = spent;
     if(cost < 0)
       l["price_unknown"] = true;
     if(logContent_) {
@@ -80,6 +82,7 @@ void Telemetry::request(std::string_view role, std::string_view npc, std::string
       l["request"] = requestText;
   }
   write(std::move(l));
+  return spent;
 }
 
 void Telemetry::verdicts(std::string_view speaker, const std::vector<Verdict>& vs) {
