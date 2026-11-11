@@ -3,5 +3,10 @@
   "world": "ADDONWORLD.ZEN",
   "waypoint": "ADW_PIRATECAMP_CENTER",
   "armor": "ITAR_PIR_L_ADDON",
-  "level": 10
+  "level": 10,
+  "items": {
+    "ITMW_ADDON_PIR1HSWORD": 1,
+    "ITMI_GOLD": 50,
+    "ITFO_BOOZE": 2
+  }
 }

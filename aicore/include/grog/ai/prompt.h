@@ -21,8 +21,9 @@ LlmRequest buildActorRequest(const NpcCard& card, const WorldState& world, const
                              Language lang, std::string_view playerLine, std::string_view rulesText);
 
 // Director = Game Master. Contains the full truth, clue graph and world summary.
+// `lang` is the language of everything the player sees (lines, quest entries).
 LlmRequest buildDirectorRequest(const WorldState& world, const Cast& cast, const Lore& lore, std::string_view trigger,
-                                std::string_view rulesText);
+                                std::string_view rulesText, Language lang = Language::En);
 
 nlohmann::json actorReplySchema();
 nlohmann::json directorReplySchema();

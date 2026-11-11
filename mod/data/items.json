@@ -1,9 +1,9 @@
 {
   "schema": 1,
-  "note": "Story item id -> Gothic II NotR item instance. ai_names are the neutral handles the AI sees (it never sees internal ids); descriptions are shown to the AI.",
+  "note": "Story item id -> Gothic II NotR item instance. The tankards use mission items that never appear in Jarkendar (vanilla silver/gold cups lie all over the camp and must not count as Greg's tankard). ai_names are the neutral handles the AI sees (it never sees internal ids); descriptions are shown to the AI; game_names/game_texts replace the item's in-game name and description.",
   "items": {
-    "greg_tankard": "ITMI_SILVERCUP",
-    "tankard_lookalike": "ITMI_GOLDCUP",
+    "greg_tankard": "ITMI_CORAGONSSILBER",
+    "tankard_lookalike": "ITMI_BLOODCUP_MIS",
     "key_reward_chest": "ITKE_GREG_ADDON_MIS",
     "captain_outfit": "ITAR_PIR_H_ADDON"
   },
@@ -18,5 +18,25 @@
     "tankard_lookalike": "a pewter tankard, smooth, without a dent or any carving",
     "key_reward_chest": "the key to Greg's chest",
     "captain_outfit": "a captain's coat"
+  },
+  "game_names": {
+    "greg_tankard": {
+      "pl": "Kufel z kotwicą",
+      "en": "Tankard with an anchor"
+    },
+    "tankard_lookalike": {
+      "pl": "Cynowy kufel",
+      "en": "Pewter tankard"
+    }
+  },
+  "game_texts": {
+    "greg_tankard": {
+      "pl": "Ciężki, cynowy, z wgnieceniem i wyrytą kotwicą.",
+      "en": "Heavy pewter, with a dent and a carved anchor."
+    },
+    "tankard_lookalike": {
+      "pl": "Gładki cynowy kufel, bez wgnieceń i rytów.",
+      "en": "A smooth pewter tankard, no dent, no carving."
+    }
   }
 }

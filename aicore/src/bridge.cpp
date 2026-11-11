@@ -174,6 +174,7 @@ std::vector<EngineAction> toEngineActions(const std::vector<Verdict>& verdicts, 
     } else if(t == "npc_approach_player") {
       e.kind = EngineAction::NpcApproachPlayer;
       e.npcInstance = instanceForNpc(data, str(a, "npc"));
+      e.text = toGameText(str(a, "text"));  // the NPC's opening line
     } else if(t == "npc_fight_npc") {
       e.kind = EngineAction::NpcFightNpc;
       e.npcInstance = instanceForNpc(data, str(a, "npc"));

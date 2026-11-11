@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cctype>
+#include <cstdlib>
 #include <set>
 
 namespace grog::ai {
@@ -67,6 +68,43 @@ Result<json> extractJson(std::string_view text) {
   return j;
 }
 
+// Models often get the argument shape slightly wrong (seen in playtests): fix the harmless variants
+// here so the validator judges the intent, not the typo. Anything else is left for the validator to reject.
+void normalizeArgs(const std::string& type, json& a) {
+  // {"type":"attitude","items":{"delta":1}} -> fields lifted to the top level (never overwriting).
+  for(const char* wrap : {"items", "args", "params"}) {
+    if(!a.contains(wrap) || !a[wrap].is_object() || type == "give_item" || type == "take_item")
+      continue;
+    json inner = a[wrap];
+    a.erase(wrap);
+    for(auto& [k, v] : inner.items())
+      if(!a.contains(k))
+        a[k] = v;
+  }
+  if(a.contains("delta")) {
+    json& d = a["delta"];
+    if(d.is_string()) {
+      const std::string s = d.get<std::string>();
+      char* end = nullptr;
+      long v = std::strtol(s.c_str(), &end, 10);
+      if(!s.empty() && end && *end == 0)
+        d = v;
+    } else if(d.is_number_float()) {
+      double v = d.get<double>();
+      if(v == static_cast<double>(static_cast<int64_t>(v)))
+        d = static_cast<int64_t>(v);
+    }
+  }
+  const bool wantsText = type == "quest_entry" || type == "quest_new" || type == "ambient_line" ||
+                         type == "npc_approach_player";
+  if(wantsText && !(a.contains("text") && a["text"].is_string()))
+    for(const char* alias : {"fact", "entry", "line", "speech"})
+      if(a.contains(alias) && a[alias].is_string()) {
+        a["text"] = a[alias];
+        break;
+      }
+}
+
 Result<std::vector<Command>> readActions(const json& j, bool required) {
   std::vector<Command> out;
   if(!j.contains("actions")) {
@@ -81,6 +119,7 @@ Result<std::vector<Command>> readActions(const json& j, bool required) {
       continue;  // skip junk entries, keep the rest
     Command c{a["type"].get<std::string>(), a};
     c.args.erase("type");
+    normalizeArgs(c.type, c.args);
     out.push_back(std::move(c));
   }
   return out;
@@ -131,12 +170,13 @@ Result<DirectorReply> parseDirectorReply(std::string_view modelText) {
 }
 
 std::vector<Verdict> validate(const std::vector<Command>& commands, std::string_view speaker, const WorldState& w,
-                              const Cast& cast) {
+                              const Cast& cast, int64_t gameTimeS) {
   std::vector<Verdict> out;
   const bool isDirector = speaker == kDirector;
   int events = w.eventsThisHour;
   bool monsterActive = !w.activeMonster.empty();
   std::map<std::string, std::string> holders = w.itemHolder;  // simulate gives within the batch
+  std::map<std::string, int64_t> approached = w.lastApproachS;  // simulate approaches within the batch
 
   for(auto& c : commands) {
     Verdict v{c, false, ""};
@@ -224,12 +264,23 @@ std::vector<Verdict> validate(const std::vector<Command>& commands, std::string_
       else
         v.accepted = true;
     } else if(c.type == "npc_approach_player" || c.type == "ambient_line") {
+      const std::string npc = str(a, "npc"), text = str(a, "text");
+      auto last = approached.find(npc);
       if(!isDirector)
         reject("only the director triggers events");
-      else if(!knownNpc(str(a, "npc")))
+      else if(npc.empty())
+        reject(c.type + " needs the npc who speaks");
+      else if(!knownNpc(npc))
         reject("unknown npc");
-      else
+      else if(text.empty() || utf8Length(text) > 300)
+        reject(c.type + " needs a text of 1-300 characters (what the npc says)");
+      else if(c.type == "npc_approach_player" && last != approached.end() && gameTimeS - last->second < kApproachCooldownS)
+        reject("this npc approached the player too recently");
+      else {
         v.accepted = true;
+        if(c.type == "npc_approach_player")
+          approached[npc] = gameTimeS;
+      }
     } else if(c.type == "npc_fight_npc") {
       std::string n1 = str(a, "npc"), n2 = str(a, "npc2");
       if(!isDirector)
@@ -298,6 +349,14 @@ void apply(const std::vector<Verdict>& verdicts, std::string_view speaker, World
       w.npcs[str(a, "npc")].knows.push_back(str(a, "fact"));
     } else if(t == "spawn_monster") {
       w.activeMonster = str(a, "monster");
+    } else if(t == "npc_approach_player") {
+      // The NPC opens the conversation with this line: it is its own words from now on.
+      const std::string npc = str(a, "npc");
+      w.lastApproachS[npc] = gameTimeS;
+      // Stored as a user/assistant pair so chat histories keep alternating roles (some providers require it).
+      auto& mem = w.npcs[npc].memory;
+      mem.push_back({ChatMessage::User, "(You walk up to the player and speak first.)"});
+      mem.push_back({ChatMessage::Assistant, str(a, "text")});
     }
     if(kEventTypes.count(t))
       ++w.eventsThisHour;

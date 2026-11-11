@@ -94,6 +94,19 @@ Result<GameData> loadGameData(const fs::path& dir) {
         target[id] = v.get<std::string>();
   }
 
+  for(const char* key : {"game_names", "game_texts"}) {
+    if(!items.value().contains(key) || !items.value()[key].is_object())
+      continue;
+    auto& target = std::string(key) == "game_names" ? d.itemGameNames : d.itemGameTexts;
+    for(auto& [id, v] : items.value()[key].items()) {
+      if(!v.is_object())
+        return Error{ErrorKind::Io, std::string("items.json: ") + key + "." + id + " must be {\"pl\":..,\"en\":..}"};
+      for(auto [lang, name] : {std::pair{Language::Pl, "pl"}, std::pair{Language::En, "en"}})
+        if(v.contains(name) && v[name].is_string())
+          target[id][lang] = v[name].get<std::string>();
+    }
+  }
+
   auto start = readJson(dir / "start.json");
   if(!start.ok())
     return start.error();
@@ -102,7 +115,16 @@ Result<GameData> loadGameData(const fs::path& dir) {
      !sj.contains("armor") || !sj["armor"].is_string() || !sj.contains("level") || !sj["level"].is_number_integer())
     return Error{ErrorKind::Io, "start.json: world, waypoint, armor and level are required"};
   d.start = {sj["world"].get<std::string>(), sj["waypoint"].get<std::string>(), sj["armor"].get<std::string>(),
-             sj["level"].get<int>()};
+             sj["level"].get<int>(), {}};
+  if(sj.contains("items")) {
+    if(!sj["items"].is_object())
+      return Error{ErrorKind::Io, "start.json: 'items' must be an object {instance: count}"};
+    for(auto& [inst, n] : sj["items"].items()) {
+      if(!n.is_number_integer() || n.get<int>() <= 0)
+        return Error{ErrorKind::Io, "start.json: item " + inst + " needs a positive count"};
+      d.start.items.push_back({inst, n.get<int>()});
+    }
+  }
 
   if(fs::exists(dir / "pricing.json")) {
     auto pj = readJson(dir / "pricing.json");
@@ -197,7 +219,7 @@ TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLi
     try {
       // Validate the whole batch, apply it to a copy, then commit: all or nothing.
       translateItems(reply->actions);
-      auto verdicts = validate(reply->actions, npc, world_, data_.cast);
+      auto verdicts = validate(reply->actions, npc, world_, data_.cast, gameTimeS);
       for(auto& v : verdicts)
         stats_.rejected += v.accepted ? 0 : 1;
       WorldState next = world_;
@@ -241,7 +263,7 @@ DirectorResult GameSession::direct(std::string_view trigger, int64_t gameTimeS) 
     std::lock_guard<std::mutex> lock(mu_);
     gen = generation_;
     ++stats_.directorCalls;
-    req = buildDirectorRequest(world_, data_.cast, data_.lore, trigger, data_.directorRules);
+    req = buildDirectorRequest(world_, data_.cast, data_.lore, trigger, data_.directorRules, config_.language);
   }
   auto res = director_.complete(req);
   telemetry_.request("director", "", director_.id(), res, trigger);
@@ -263,8 +285,9 @@ DirectorResult GameSession::direct(std::string_view trigger, int64_t gameTimeS) 
     out.thought = parsed.value().thought;
     auto actions = parsed.value().actions;
     translateItems(actions);
-    auto verdicts = validate(actions, kDirector, world_, data_.cast);
     WorldState next = world_;
+    next.rollEventHour(gameTimeS);
+    auto verdicts = validate(actions, kDirector, next, data_.cast, gameTimeS);
     apply(verdicts, kDirector, next, gameTimeS);
     world_ = std::move(next);
     out.verdicts = std::move(verdicts);
