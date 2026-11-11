@@ -186,7 +186,7 @@ TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLi
   if(!voiceable || tts_.load() == nullptr)
     return out;
   // The reply is already applied; synthesis runs without the lock, like the LLM call.
-  Voiced v = voice(npc, out.speech, false);
+  Voiced v = voice(npc, out.speech, out.usedFallback);  // fallback lines are fixed texts: cached
   std::lock_guard<std::mutex> lock(mu_);
   if(gen != generation_) {  // a save was loaded while the audio was made: drop it with the turn's effects
     out.error = Error{ErrorKind::Validation, "answer discarded: the game state was reloaded"};
@@ -558,6 +558,8 @@ Result<bool> GameSession::loadState(const nlohmann::json& j) {
     stats_.ttsLatencySumMs = st.value("tts_latency_sum_ms", 0.0);
     lastGameT_ = st.at("play_time_s").get<int64_t>();
     directorInFlight_ = false;
+    ttsOffReason_.reset();  // a new game or a load gives the voice another chance
+    ttsTransientFails_ = 0;
     ++generation_;
   } catch(const nlohmann::json::exception& e) {
     return Error{ErrorKind::Io, std::string("AI save data: ") + e.what()};
@@ -592,8 +594,9 @@ std::future<Speech> GameSession::farewellAsync(std::string npc) {
     std::lock_guard<std::mutex> lock(mu_);
     gen = generation_;
   }
-  return std::async(std::launch::async, [this, npc = std::move(npc), gen]() {
-    return speak(npc, farewell(npc), true, gen);
+  std::string text = farewell(npc);  // picked here, not on the worker: the RNG draw keeps the caller's order
+  return std::async(std::launch::async, [this, npc = std::move(npc), text = std::move(text), gen]() {
+    return speak(npc, text, true, gen);
   });
 }
 
@@ -652,6 +655,13 @@ GameSession::Voiced GameSession::voice(const std::string& npc, const std::string
   ITtsProvider* tts = tts_.load();
   if(tts == nullptr || text.find_first_not_of(" .") == std::string::npos)
     return {};
+  uint64_t gen = 0;
+  {
+    std::lock_guard<std::mutex> lock(mu_);
+    if(ttsOffReason_)
+      return {"", ttsOffReason_};  // turned off by the backoff: no request (its hint shows once, if not yet)
+    gen = generation_;
+  }
   // data_ and config_ never change after construction: no lock needed.
   TtsRequest req;
   req.text = text;
@@ -680,10 +690,11 @@ GameSession::Voiced GameSession::voice(const std::string& npc, const std::string
     if(fs::is_regular_file(file, ec)) {
       auto cached = readTextFile(file);
       if(cached.ok()) {
-        if(auto ms = wavDurationMs(cached.value())) {  // anything else is a miss
+        // Anything the engine cannot play (e.g. a streamed file cached before normalisation) is a miss.
+        if(auto wav = normalizeWav(cached.value()); wav && *wav == cached.value()) {
           TtsReply r;
-          r.wav = std::move(cached.value());
-          r.audioMs = *ms;
+          r.wav = std::move(*wav);
+          r.audioMs = *wavDurationMs(r.wav);
           r.model = model;
           Result<TtsReply> res(std::move(r));
           telemetry_.tts(npc, model, res, chars, true);
@@ -704,6 +715,20 @@ GameSession::Voiced GameSession::voice(const std::string& npc, const std::string
       stats_.ttsLatencySumMs += res.value().latencyMs;
     } else {
       ++stats_.ttsErrors;
+    }
+    if(gen == generation_ && !ttsOffReason_) {  // a result from before a load does not count against the new game
+      if(res.ok()) {
+        ttsTransientFails_ = 0;
+      } else {
+        // A bad key, a rejected request or an unplayable reply fails every time; a slow or unreachable server
+        // gets one more chance, so a hung server costs at most two timeouts instead of one per line.
+        const ErrorKind k = res.error().kind;
+        const bool permanent = k == ErrorKind::Auth || k == ErrorKind::Config || k == ErrorKind::BadResponse;
+        if(permanent || ++ttsTransientFails_ >= kTtsMaxTransientFails) {
+          ttsOffReason_ = k;
+          telemetry_.event("tts", {{"npc", npc}, {"disabled", true}, {"reason", errorKindName(k)}});
+        }
+      }
     }
   }
   if(!res.ok())

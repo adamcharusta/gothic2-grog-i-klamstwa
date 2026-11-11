@@ -133,10 +133,12 @@ TEST_CASE("voice: tts failure keeps the text") {
   CHECK(b.speech == "No i co?");
   CHECK(b.audioWav.empty());
   CHECK(b.hint.empty());
+  CHECK(f.tts.requests.size() == 1);  // a rejected key turns the voice off
   auto tl = f.lines("tts");
   REQUIRE(tl.size() == 2);
   CHECK(tl[0]["ok"] == false);
   CHECK(tl[0]["error"] == "Auth");
+  CHECK(tl[1]["disabled"] == true);
 
   SUBCASE("LLM error hints keep priority when both fail in one turn") {
     VoiceFx g;
@@ -154,7 +156,7 @@ TEST_CASE("voice: tts failure keeps the text") {
 
 TEST_CASE("voice: hints exist for voice errors in both languages") {
   for(ErrorKind k : {ErrorKind::Auth, ErrorKind::RateLimit, ErrorKind::Network, ErrorKind::Timeout,
-                     ErrorKind::BadResponse})
+                     ErrorKind::BadResponse, ErrorKind::Config})
     for(Language l : {Language::Pl, Language::En}) {
       std::string h = voiceHint(k, l);
       CHECK_FALSE(h.empty());
@@ -164,6 +166,97 @@ TEST_CASE("voice: hints exist for voice errors in both languages") {
   CHECK(voiceHint(ErrorKind::BadResponse, Language::En).find("response_format=wav") != std::string::npos);
   CHECK(voiceHint(ErrorKind::BadResponse, Language::Pl).find("response_format=wav") != std::string::npos);
   CHECK(voiceHint(ErrorKind::Validation, Language::Pl).empty());
+  for(Language l : {Language::Pl, Language::En}) {
+    std::string h = voiceHint(ErrorKind::Config, l);
+    CHECK(h.find("[tts]") != std::string::npos);
+    CHECK(h.find("base_url") != std::string::npos);
+    CHECK(h.find("voices") != std::string::npos);
+  }
+}
+
+TEST_CASE("voice: a non-transient tts error turns the voice off for the session") {
+  for(ErrorKind k : {ErrorKind::Auth, ErrorKind::Config, ErrorKind::BadResponse}) {
+    VoiceFx f;
+    f.tts.scriptedErrors = {Error{k, "nope"}};
+    f.actor.scripted = {R"({"speech":"Czego chcesz?"})", R"({"speech":"No i co?"})"};
+    auto a = f.s->talk("greg", "Siema", 10);
+    CHECK(a.audioWav.empty());
+    CHECK(a.hint == voiceHint(k, Language::Pl));
+    auto b = f.s->talk("greg", "Halo?", 20);
+    CHECK(b.speech == "No i co?");
+    CHECK(b.audioWav.empty());
+    CHECK(b.hint.empty());
+    CHECK(f.s->farewellAsync("greg").get().audioWav.empty());
+    CHECK(f.tts.requests.size() == 1);
+    std::vector<json> off;
+    for(auto& l : f.lines("tts"))
+      if(l.value("disabled", false))
+        off.push_back(l);
+    REQUIRE(off.size() == 1);
+    CHECK(off[0]["reason"] == errorKindName(k));
+    CHECK(f.s->summary()["tts_requests"] == 1);
+  }
+}
+
+TEST_CASE("voice: two transient tts errors in a row turn the voice off") {
+  VoiceFx f;
+  f.tts.scriptedErrors = {Error{ErrorKind::Timeout, "slow"}, Error{ErrorKind::Timeout, "slow"}};
+  f.actor.scripted = {R"({"speech":"Raz."})", R"({"speech":"Dwa."})", R"({"speech":"Trzy."})"};
+  CHECK(f.s->talk("greg", "a", 10).audioWav.empty());
+  CHECK(f.s->talk("greg", "b", 20).audioWav.empty());
+  CHECK(f.s->talk("greg", "c", 30).audioWav.empty());
+  CHECK(f.tts.requests.size() == 2);
+  auto tl = f.lines("tts");
+  REQUIRE_FALSE(tl.empty());
+  CHECK(tl.back()["disabled"] == true);
+  CHECK(tl.back()["reason"] == "Timeout");
+
+  SUBCASE("a new game (loadState) turns it back on") {
+    VoiceFx g;
+    json fresh = g.s->saveState();
+    REQUIRE(f.s->loadState(fresh).ok());
+    f.actor.scripted = {R"({"speech":"Znowu."})"};
+    CHECK(isWav(f.s->talk("greg", "d", 40).audioWav));
+    CHECK(f.tts.requests.size() == 3);
+  }
+}
+
+TEST_CASE("voice: a success resets the transient error count") {
+  VoiceFx f;
+  f.tts.scriptedErrors = {Error{ErrorKind::Timeout, "slow"}};
+  f.actor.scripted = {R"({"speech":"Raz."})", R"({"speech":"Dwa."})", R"({"speech":"Trzy."})",
+                      R"({"speech":"Cztery."})"};
+  CHECK(f.s->talk("greg", "a", 10).audioWav.empty());
+  CHECK(isWav(f.s->talk("greg", "b", 20).audioWav));
+  f.tts.scriptedErrors = {Error{ErrorKind::Timeout, "slow"}};
+  CHECK(f.s->talk("greg", "c", 30).audioWav.empty());
+  CHECK(isWav(f.s->talk("greg", "d", 40).audioWav));
+  CHECK(f.tts.requests.size() == 4);
+  for(auto& l : f.lines("tts"))
+    CHECK_FALSE(l.contains("disabled"));
+}
+
+TEST_CASE("voice: fallback lines are cached") {
+  VoiceFx f;
+  // Every reply is unusable, so both turns fall back; repeat until the same fallback line comes twice.
+  for(int i = 0; i < 40; ++i)
+    f.actor.scripted.push_back("not json");
+  auto a = f.s->talk("greg", "Siema", 10);
+  REQUIRE(a.usedFallback);
+  TurnResult b;
+  for(int i = 0; i < 15; ++i) {
+    b = f.s->talk("greg", "Siema", 20 + i);
+    if(b.speech == a.speech)
+      break;
+  }
+  REQUIRE(b.usedFallback);
+  REQUIRE(b.speech == a.speech);
+  CHECK(isWav(b.audioWav));
+  CHECK(b.audioWav == a.audioWav);
+  size_t requestsForLine = 0;
+  for(auto& r : f.tts.requests)
+    requestsForLine += r.text == a.speech ? 1 : 0;
+  CHECK(requestsForLine == 1);
 }
 
 TEST_CASE("voice: farewells are cached") {
@@ -213,6 +306,15 @@ TEST_CASE("voice: a broken cache file counts as a miss") {
   Speech b = f.s->speakAsync("greg", "Spadaj.", true).get();
   CHECK(isWav(b.audioWav));
   CHECK(f.tts.requests.size() == 2);
+  // A streamed file with placeholder sizes (cached by an older build) is a miss too: the engine cannot play it.
+  for(auto& e : fs::directory_iterator(f.cache.path)) {
+    std::string w = b.audioWav;
+    w.replace(4, 4, "\xFF\xFF\xFF\xFF");
+    REQUIRE(writeTextFile(e.path(), w).ok());
+  }
+  Speech c = f.s->speakAsync("greg", "Spadaj.", true).get();
+  CHECK(c.audioWav == b.audioWav);
+  CHECK(f.tts.requests.size() == 3);
 }
 
 TEST_CASE("voice: answers are not cached") {

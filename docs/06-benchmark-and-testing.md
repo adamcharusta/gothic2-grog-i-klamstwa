@@ -17,6 +17,7 @@ Every playthrough writes a file (e.g. JSONL in `logs/`) with:
 
 With voice on, every TTS call also writes a line `{"kind":"tts","npc","model","ok","chars","audio_ms","latency_ms","cost_usd","cached","error"?}`
 (`price_unknown: true` when the model has no entry in `pricing.json` `tts`; cached lines cost 0; the provider's error text and the key are never logged).
+When repeated failures turn the voice off for the session, one more `{"kind":"tts","npc","disabled":true,"reason":<error kind>}` line is written.
 
 No API key, no personal data. Full conversation text behind a switch (on by default, local only).
 

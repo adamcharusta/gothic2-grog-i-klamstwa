@@ -62,7 +62,7 @@ struct TurnResult {
   std::string audioWav;        // WAV of `speech`; empty when voice is off or synthesis failed
 };
 
-// A voiced line outside a talk turn (director openings, ambient lines, farewells).
+// A voiced line outside a talk turn (director openings, farewells). Ambient lines stay silent.
 struct Speech {
   std::string text;      // UTF-8
   std::string audioWav;  // empty when voice is off or synthesis failed
@@ -98,6 +98,7 @@ class GameSession {
   // Voice (TTS). nullptr = voice off. The provider must outlive every future from talkAsync/speakAsync/
   // farewellAsync. Synthesis runs without holding the world lock. Results are discarded (empty Speech) when a
   // save is loaded while they are in flight.
+  // Repeated failures turn the voice off for the session (until loadState): see ttsOffReason_.
   void setTts(ITtsProvider* tts);
   // `cacheable` lines are kept as <cacheDir>/<hash>.wav and synthesized only once (fixed texts like farewells).
   std::future<Speech> speakAsync(std::string npc, std::string textUtf8, bool cacheable);
@@ -144,13 +145,18 @@ class GameSession {
               std::string_view requestText);
   std::set<ErrorKind> hinted_;     // error kinds already explained to the player
   std::set<ErrorKind> hintedTts_;  // voice error kinds already explained to the player
+  // Voice backoff (under mu_): a non-transient error, or kTtsMaxTransientFails transient ones in a row, turns the
+  // voice off until loadState. While off, voice() makes no requests and reports `ttsOffReason_` as its error.
+  std::optional<ErrorKind> ttsOffReason_;
+  int ttsTransientFails_ = 0;
 
   struct Voiced {
     std::string wav;
     std::optional<ErrorKind> error;
   };
   // Synthesizes `text` for `npc` (cache first when `cacheable`), logs it and adds it to the stats.
-  // Must be called without holding mu_. Returns an empty wav when voice is off or synthesis failed.
+  // Must be called without holding mu_. Returns an empty wav when voice is off, turned off by the backoff, or
+  // synthesis failed.
   Voiced voice(const std::string& npc, const std::string& text, bool cacheable);
   // Voice hint for `error` the first time this kind occurs, else "". Caller holds mu_.
   std::string takeVoiceHint(const std::optional<ErrorKind>& error);

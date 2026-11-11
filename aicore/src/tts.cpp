@@ -2,6 +2,7 @@
 
 #include <grog/ai/llm.h>
 
+#include <algorithm>
 #include <chrono>
 #include <cstdint>
 
@@ -92,9 +93,13 @@ class OpenAiTts : public ITtsProvider {
     auto ms = wavDurationMs(res.value().body);
     if(!ms)
       return Error{ErrorKind::BadResponse, "openai_tts: the reply is not a PCM WAV file"};
+    // Streamed replies carry placeholder sizes; the engine also plays only 8/16-bit PCM.
+    auto wav = normalizeWav(res.value().body);
+    if(!wav)
+      return Error{ErrorKind::BadResponse, "openai_tts: the WAV is not 8- or 16-bit PCM (mono or stereo)"};
     TtsReply out;
-    out.wav = std::move(res.value().body);
-    out.audioMs = *ms;
+    out.wav = std::move(*wav);
+    out.audioMs = *wavDurationMs(out.wav);
     out.model = cfg_.model;
     out.latencyMs = std::chrono::duration<double, std::milli>(Clock::now() - t0).count();
     return out;
@@ -132,6 +137,51 @@ std::optional<int> wavDurationMs(std::string_view wav) {
       return int(n * 1000 / byteRate);
     }
     pos = body + len + (len & 1);
+  }
+  return std::nullopt;
+}
+
+std::optional<std::string> normalizeWav(std::string_view wav) {
+  if(wav.size() < 12 || wav.substr(0, 4) != "RIFF" || wav.substr(8, 4) != "WAVE")
+    return std::nullopt;
+  // Tempest (the engine's decoder) reads the data chunk by its stated length and plays only 8/16-bit PCM.
+  bool fmtOk = false;
+  uint32_t frame = 0;  // bytes per sample frame
+  std::string out(wav.substr(0, 12));
+  size_t pos = 12;
+  while(pos + 8 <= wav.size()) {
+    std::string_view id = wav.substr(pos, 4);
+    uint32_t len = rd32(wav, pos + 4);
+    size_t body = pos + 8;
+    if(id == "data") {
+      if(!fmtOk)
+        return std::nullopt;
+      uint64_t n = std::min<uint64_t>(len, wav.size() - body);
+      n -= n % frame;  // whole sample frames only
+      out += "data";
+      put32(out, uint32_t(n));
+      out.append(wav.substr(body, size_t(n)));
+      if(n & 1)
+        out.push_back('\0');  // RIFF pad byte; the decoder expects it
+      const uint32_t riff = uint32_t(out.size() - 8);
+      for(int i = 0; i < 4; ++i)
+        out[4 + size_t(i)] = char((riff >> (8 * i)) & 0xff);
+      return out;
+    }
+    const uint64_t next = uint64_t(body) + len + (len & 1);
+    if(next > wav.size())
+      return std::nullopt;  // a chunk before the data that does not fit
+    if(id == "fmt ") {
+      if(len < 16)
+        return std::nullopt;
+      const uint16_t format = rd16(wav, body), channels = rd16(wav, body + 2), bits = rd16(wav, body + 14);
+      frame = uint32_t(channels) * bits / 8;
+      fmtOk = format == 1 && (channels == 1 || channels == 2) && (bits == 8 || bits == 16) && rd32(wav, body + 4) != 0;
+      if(!fmtOk)
+        return std::nullopt;
+    }
+    out.append(wav.substr(pos, size_t(next - pos)));
+    pos = size_t(next);
   }
   return std::nullopt;
 }

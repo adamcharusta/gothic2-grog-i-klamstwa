@@ -43,6 +43,11 @@ std::string voiceHint(ErrorKind kind, Language lang) {
     case ErrorKind::BadResponse:
       return pl ? "Serwer głosu musi zwracać WAV (response_format=wav) - zostają same napisy."
                 : "The voice server must return WAV (response_format=wav) - subtitles only.";
+    case ErrorKind::Config:
+      return pl ? "Serwer głosu odrzuca żądanie - sprawdź model, base_url i voices w sekcji [tts] pliku GrogAI.ini. "
+                  "Zostają same napisy."
+                : "The voice server rejects the request - check model, base_url and voices in the [tts] section of "
+                  "GrogAI.ini. Subtitles only.";
     default:
       return {};
   }

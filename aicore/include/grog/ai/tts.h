@@ -49,7 +49,15 @@ std::unique_ptr<ITtsProvider> makeTtsProvider(const TtsConfig& c, IHttpClient& h
 // Duration of a PCM RIFF/WAVE file; nullopt if it is not one (unknown chunks are skipped).
 std::optional<int> wavDurationMs(std::string_view wav);
 
+// A copy of `wav` the engine can play: 8- or 16-bit PCM, mono or stereo, with exact RIFF and data sizes (streamed
+// files carry 0xFFFFFFFF placeholders), the data trimmed to the bytes present and padded to an even length.
+// Chunks before the data keep their order; anything after it is dropped. nullopt for anything else.
+std::optional<std::string> normalizeWav(std::string_view wav);
+
 // Longer texts are cut at a sentence end (or hard, on a UTF-8 boundary) before synthesis.
 constexpr size_t kTtsMaxChars = 600;
+
+// Transient voice errors (timeout, network, server, ...) in a row that turn the voice off for the session.
+constexpr int kTtsMaxTransientFails = 2;
 
 }  // namespace grog::ai

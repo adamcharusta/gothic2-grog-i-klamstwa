@@ -66,6 +66,9 @@ Optional, off by default. A separate `[tts]` section (the full commented block i
 - An NPC answer is shown only when text and audio are both ready; the subtitle lasts as long as the audio; Esc stops the voice.
 - The hero's typed lines and director `ambient_line` prints are not voiced.
 - A broken `[tts]` config or a failing request never blocks the game: subtitles only, one hint per error kind (PL/EN).
+  A rejected key/request or an unplayable reply (anything but 8/16-bit PCM WAV) turns the voice off for the session at once;
+  timeouts and network/server errors do after two in a row (a success resets the count). Loading a save or a new game turns it back on.
+- Streamed WAVs with placeholder sizes are normalised (exact RIFF/data sizes) before they are played or cached.
 - The `[tts]` key is never logged. Original voices: clips are extracted on the player's PC from their own copy
   (`Data\Speech*.vdf`), nothing is uploaded, the mod and package ship no voice data (the README says the voices belong to the original actors and must not be shared).
 

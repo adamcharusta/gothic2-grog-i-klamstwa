@@ -135,6 +135,27 @@ TEST_CASE("tts reuses the ai key for the same base_url") {
   CHECK(r.value().tts.cacheDir == "tts_cache");
 }
 
+TEST_CASE("tts does not reuse the ai key for another base_url or provider") {
+  // A different server: the [ai] key must not leak to it. A TTS server without a key is allowed (local servers).
+  auto other = parseConfig(
+      "[ai]\nprovider = openai_compatible\nbase_url = https://api.openai.com/v1\nmodel = m\napi_key = sk-a\n"
+      "[tts]\nprovider = openai_compatible\nbase_url = http://localhost:8000/v1\n",
+      noEnv());
+  REQUIRE(other.ok());
+  CHECK(other.value().tts.kind == TtsKind::OpenAiCompatible);
+  CHECK(other.value().tts.apiKey.empty());
+  CHECK(redactedSummary(other.value()).find("tts_key=(none)") != std::string::npos);
+
+  // An Anthropic key is never sent to a TTS server, even with the same base_url.
+  auto anth = parseConfig(
+      "[ai]\nprovider = anthropic\nbase_url = https://api.openai.com/v1\nmodel = m\napi_key = sk-ant\n"
+      "[tts]\nprovider = openai_compatible\nbase_url = https://api.openai.com/v1\n",
+      noEnv());
+  REQUIRE(anth.ok());
+  CHECK(anth.value().tts.apiKey.empty());
+  CHECK(anth.value().tts.apiKey != "sk-ant");
+}
+
 TEST_CASE("tts key from env and own key wins") {
   auto env = [](std::string_view name) -> std::optional<std::string> {
     if(name == "GROGAI_TTS_API_KEY")
