@@ -23,7 +23,6 @@ double msSince(Clock::time_point t0) {
   return std::chrono::duration<double, std::milli>(Clock::now() - t0).count();
 }
 
-// Maps an HTTP status to an error. The provider body is NOT copied into the message (it may echo the key).
 }  // namespace
 
 bool isReasoningModel(std::string_view model) {
@@ -35,8 +34,7 @@ bool isReasoningModel(std::string_view model) {
   return false;
 }
 
-namespace {
-
+// Maps an HTTP status to an error. The provider body is NOT copied into the message (it may echo the key).
 Error statusError(int status, std::string_view provider) {
   std::string p(provider);
   if(status == 401 || status == 403)
@@ -49,6 +47,8 @@ Error statusError(int status, std::string_view provider) {
     return {ErrorKind::Config, p + ": request rejected, check model and base_url (HTTP " + std::to_string(status) + ")"};
   return {ErrorKind::BadResponse, p + ": request rejected (HTTP " + std::to_string(status) + ")"};
 }
+
+namespace {
 
 json chatMessages(const LlmRequest& req) {
   json arr = json::array();
