@@ -167,6 +167,38 @@ Result<AiConfig> parseConfig(std::string_view iniText, const EnvLookup& env) {
 
   if(auto d = get(m, "telemetry.log_dir"); !d.empty())
     c.logDir = d;
+
+  std::string ttsProvider = lower(get(m, "tts.provider"));
+  if(ttsProvider.empty() || ttsProvider == "off") {
+    c.tts.kind = TtsKind::Off;
+  } else if(ttsProvider == "openai_compatible") {
+    c.tts.kind = TtsKind::OpenAiCompatible;
+    c.tts.baseUrl = get(m, "tts.base_url");
+    while(!c.tts.baseUrl.empty() && c.tts.baseUrl.back() == '/')
+      c.tts.baseUrl.pop_back();
+    if(c.tts.baseUrl.empty())
+      return configError("[tts] base_url is required for provider openai_compatible");
+    if(auto tm = get(m, "tts.model"); !tm.empty())
+      c.tts.model = tm;
+    c.tts.apiKey = get(m, "tts.api_key");
+    if(c.tts.apiKey.empty()) {
+      if(auto k = env("GROGAI_TTS_API_KEY"))
+        c.tts.apiKey = *k;
+    }
+    if(c.tts.apiKey.empty() && c.actor.kind == ProviderKind::OpenAiCompatible && c.actor.baseUrl == c.tts.baseUrl)
+      c.tts.apiKey = c.actor.apiKey;
+    if(auto t = get(m, "tts.timeout_s"); !t.empty()) {
+      int v = 0;
+      auto [p, ec] = std::from_chars(t.data(), t.data() + t.size(), v);
+      if(ec != std::errc() || p != t.data() + t.size())
+        return configError("[tts] timeout_s must be a whole number of seconds (5-60)");
+      c.tts.timeoutS = std::clamp(v, 5, 60);
+    }
+    if(auto d = get(m, "tts.cache_dir"); !d.empty())
+      c.tts.cacheDir = d;
+  } else {
+    return configError("unknown [tts] provider '" + ttsProvider + "' (expected off or openai_compatible)");
+  }
   return c;
 }
 
@@ -192,6 +224,12 @@ std::string redactedSummary(const AiConfig& c) {
   s += " language=";
   s += languageName(c.language);
   s += " timeout_s=" + std::to_string(c.actor.timeoutS);
+  if(c.tts.kind == TtsKind::OpenAiCompatible) {
+    s += " tts=openai_compatible tts_model=" + c.tts.model + " tts_key=";
+    s += c.tts.apiKey.empty() ? "(none)" : "***";
+  } else {
+    s += " tts=off";
+  }
   return s;
 }
 
