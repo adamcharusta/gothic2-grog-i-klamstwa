@@ -66,7 +66,7 @@ TEST_CASE("task1: bridge maps take_item to the engine") {
   auto acts = toEngineActions(r.verdicts, "greg", f.s->data());
   REQUIRE(acts.size() == 1);
   CHECK(acts[0].kind == EngineAction::TakeItemFromPlayer);
-  CHECK(acts[0].itemInstance == "ITMI_SILVERCUP");
+  CHECK(acts[0].itemInstance == "ITMI_CORAGONSSILBER");
   CHECK(acts[0].npcInstance == "PIR_1320_ADDON_GREG");
 }
 

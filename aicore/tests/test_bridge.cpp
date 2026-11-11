@@ -55,7 +55,7 @@ TEST_CASE("accepted verdicts become engine actions; rejected ones do nothing") {
   REQUIRE(acts.size() == 3);
   CHECK(acts[0].kind == EngineAction::GiveItemToPlayer);
   CHECK(acts[0].npcInstance == "PIR_1365_ADDON_MATT");
-  CHECK(acts[0].itemInstance == "ITMI_SILVERCUP");
+  CHECK(acts[0].itemInstance == "ITMI_CORAGONSSILBER");
   CHECK(acts[1].kind == EngineAction::QuestEntry);
   CHECK(acts[1].text == toGameText("Porozmawiaj ze Skipem."));
   CHECK(acts[2].kind == EngineAction::StartFight);

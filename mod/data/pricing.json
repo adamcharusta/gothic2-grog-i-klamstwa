@@ -1,5 +1,26 @@
 {
   "schema": 1,
-  "note": "USD per million tokens, used only for the cost estimate in benchmark logs. Fill in from your provider's current price list; unknown models are logged with price_unknown=true and cost 0. Token counts are always logged.",
-  "models": {}
+  "note": "USD per million tokens, used only for the cost estimate in benchmark logs. Dated snapshot names (e.g. gpt-4.1-mini-2025-04-14) use the price of the listed base name. Check your provider's current price list; unknown models are logged with price_unknown=true and cost 0. Token counts are always logged.",
+  "models": {
+    "gpt-4.1": {
+      "input": 2.0,
+      "output": 8.0
+    },
+    "gpt-4.1-mini": {
+      "input": 0.4,
+      "output": 1.6
+    },
+    "gpt-4.1-nano": {
+      "input": 0.1,
+      "output": 0.4
+    },
+    "gpt-4o": {
+      "input": 2.5,
+      "output": 10.0
+    },
+    "gpt-4o-mini": {
+      "input": 0.15,
+      "output": 0.6
+    }
+  }
 }

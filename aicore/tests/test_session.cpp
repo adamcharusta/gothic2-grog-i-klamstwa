@@ -119,7 +119,7 @@ TEST_CASE("talkAsync gives the same result as talk") {
 
 TEST_CASE("director commands are validated and applied") {
   Fixture f;
-  f.director.scripted = {R"({"thought":"nudge","actions":[{"type":"npc_approach_player","npc":"skip"},
+  f.director.scripted = {R"({"thought":"nudge","actions":[{"type":"npc_approach_player","npc":"skip","text":"Hej, ty!"},
     {"type":"spawn_monster","monster":"dragon","place":"beach"}]})"};
   auto r = f.session->direct("player_idle", 30);
   CHECK_FALSE(r.error.has_value());

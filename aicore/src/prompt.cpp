@@ -173,7 +173,7 @@ LlmRequest buildActorRequest(const NpcCard& card, const WorldState& w, const Cas
 }
 
 LlmRequest buildDirectorRequest(const WorldState& w, const Cast& cast, const Lore& lore, std::string_view trigger,
-                                std::string_view rulesText) {
+                                std::string_view rulesText, Language lang) {
   const Scenario& s = w.scenario;
   std::ostringstream sys;
   sys << rulesText << "\n\n# World\n";
@@ -207,6 +207,9 @@ LlmRequest buildDirectorRequest(const WorldState& w, const Cast& cast, const Lor
   sys << "\nNPC ids:";
   for(auto& m : cast.npcs)
     sys << " " << m.id;
+  sys << "\nNPCs who approached the player recently (game seconds; do not send them again soon):";
+  for(auto& [id, t] : w.lastApproachS)
+    sys << " " << id << "@" << t;
   sys << "\nQuest log so far:\n";
   for(auto& q : w.quests)
     sys << "- " << q.text << "\n";
@@ -214,6 +217,8 @@ LlmRequest buildDirectorRequest(const WorldState& w, const Cast& cast, const Lor
   size_t from = w.facts.size() > 10 ? w.facts.size() - 10 : 0;
   for(size_t i = from; i < w.facts.size(); ++i)
     sys << "- " << w.facts[i].text << "\n";
+  sys << "\nWrite every `text` the player will see (spoken lines, quest entries) in " << langWord(lang)
+      << ". `thought` and `fact` may be in English.\n";
 
   LlmRequest req;
   req.system = sys.str();

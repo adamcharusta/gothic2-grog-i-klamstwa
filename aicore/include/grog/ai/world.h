@@ -17,6 +17,7 @@ namespace grog::ai {
 inline constexpr const char* kTankard = "greg_tankard";
 inline constexpr int kWorldSaveVersion = 2;
 inline constexpr const char* kRewardKey = "key_reward_chest";
+inline constexpr int64_t kEventHourS = 3600;  // game seconds per "events this hour" window
 
 struct Fact {
   int64_t gameTimeS = 0;
@@ -46,6 +47,8 @@ class WorldState {
   std::vector<Fact> facts;
   std::vector<QuestEntry> quests;
   int eventsThisHour = 0;
+  int64_t eventsHourStartS = 0;                  // game time the current "events this hour" window began
+  std::map<std::string, int64_t> lastApproachS;  // npc id -> game time it last approached the player
   std::string activeMonster;  // "" when none
   std::string ending;         // "" while playing; returned | fooled | caught | gave_up
 
@@ -54,6 +57,8 @@ class WorldState {
   void addFact(Fact f) { facts.push_back(std::move(f)); }
   std::vector<Fact> factsKnownBy(std::string_view npc) const;
   std::set<std::string> burnedNpcs() const;
+  // Starts a new "events this hour" window when an hour of game time has passed.
+  void rollEventHour(int64_t gameTimeS);
 };
 
 nlohmann::json toJson(const WorldState& w);

@@ -139,7 +139,7 @@ TEST_CASE("validation: director events and limits") {
   CHECK_FALSE(validate({cmd("spawn_monster", {{"monster", "bloodfly"}, {"place", "beach"}})}, kDirector, w, cast)[0].accepted);
 
   w.eventsThisHour = kMaxEventsPerHour - 1;
-  auto two = validate({cmd("npc_approach_player", {{"npc", "skip"}}), cmd("npc_approach_player", {{"npc", "matt"}})},
+  auto two = validate({cmd("npc_approach_player", {{"npc", "skip"}, {"text", "Hej."}}), cmd("npc_approach_player", {{"npc", "matt"}, {"text", "Ej."}})},
                       kDirector, w, cast);
   CHECK(two[0].accepted);
   CHECK_FALSE(two[1].accepted);  // limit reached inside the same batch

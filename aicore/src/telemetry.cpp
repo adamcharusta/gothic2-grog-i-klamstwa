@@ -5,8 +5,19 @@ using nlohmann::json;
 
 double Pricing::estimate(const std::string& model, int inTok, int outTok) const {
   auto it = perMillion.find(model);
-  if(it == perMillion.end())
-    return -1.0;
+  if(it == perMillion.end()) {
+    // Providers report dated snapshots ("gpt-4.1-mini-2025-04-14"): use the longest listed name followed by '-'.
+    size_t best = 0;
+    for(auto i = perMillion.begin(); i != perMillion.end(); ++i) {
+      const std::string& k = i->first;
+      if(k.size() > best && model.size() > k.size() && model.compare(0, k.size(), k) == 0 && model[k.size()] == '-') {
+        best = k.size();
+        it = i;
+      }
+    }
+    if(best == 0)
+      return -1.0;
+  }
   return (inTok * it->second.first + outTok * it->second.second) / 1'000'000.0;
 }
 

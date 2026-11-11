@@ -27,6 +27,7 @@ struct StartSetup {
   std::string waypoint;  // where the hero starts
   std::string armor;     // item instance equipped at start
   int level = 1;
+  std::vector<std::pair<std::string, int>> items;  // item instance -> count given at start (start.json "items")
 };
 
 // Everything loaded from mod/data.
@@ -38,6 +39,8 @@ struct GameData {
   std::string directorRules;
   Pricing pricing;
   std::map<std::string, std::string> items;  // story item id -> engine item instance (items.json)
+  std::map<std::string, LangText> itemGameNames;  // story item id -> in-game name (items.json "game_names")
+  std::map<std::string, LangText> itemGameTexts;  // story item id -> in-game description ("game_texts")
   StartSetup start;                          // start.json
 };
 

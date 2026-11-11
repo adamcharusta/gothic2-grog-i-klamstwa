@@ -30,6 +30,13 @@ std::set<std::string> WorldState::burnedNpcs() const {
   return out;
 }
 
+void WorldState::rollEventHour(int64_t gameTimeS) {
+  if(gameTimeS - eventsHourStartS < kEventHourS)
+    return;
+  eventsThisHour = 0;
+  eventsHourStartS = gameTimeS;
+}
+
 json toJson(const WorldState& w) {
   json npcs = json::object();
   for(auto& [id, st] : w.npcs) {
@@ -52,6 +59,8 @@ json toJson(const WorldState& w) {
           {"facts", facts},
           {"quests", quests},
           {"events_this_hour", w.eventsThisHour},
+          {"events_hour_start", w.eventsHourStartS},
+          {"last_approach", w.lastApproachS},
           {"active_monster", w.activeMonster},
           {"ending", w.ending}};
 }
@@ -84,6 +93,10 @@ Result<WorldState> worldFromJson(const json& j) {
     for(auto& q : j.at("quests"))
       w.quests.push_back({q.at("quest").get<std::string>(), q.at("text").get<std::string>(), q.at("t").get<int64_t>()});
     w.eventsThisHour = j.at("events_this_hour").get<int>();
+    // Added after beta.5; older v2 saves lack them.
+    w.eventsHourStartS = j.value("events_hour_start", int64_t(0));
+    if(j.contains("last_approach"))
+      w.lastApproachS = j.at("last_approach").get<std::map<std::string, int64_t>>();
     w.activeMonster = j.at("active_monster").get<std::string>();
     w.ending = j.at("ending").get<std::string>();
   } catch(const json::exception& e) {
