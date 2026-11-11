@@ -28,6 +28,7 @@ struct StartSetup {
   std::string armor;     // item instance equipped at start
   int level = 1;
   std::vector<std::pair<std::string, int>> items;  // item instance -> count given at start (start.json "items")
+  std::map<std::string, std::string> firstQuest;    // {pl,en}: first quest log entry (start.json "first_quest")
 };
 
 // Everything loaded from mod/data.

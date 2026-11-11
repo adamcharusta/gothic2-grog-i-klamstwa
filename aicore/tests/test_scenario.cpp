@@ -121,3 +121,19 @@ TEST_CASE("review I1: liar story and graph agree; golden scenario pins cross-com
   CHECK(g.clues.size() == GOLDEN_CLUES);
   CHECK(g.clues.back().fact == GOLDEN_LAST_FACT);
 }
+
+TEST_CASE("playtest 2: cast members far from the camp get a camp routine") {
+  Cast c = loadTestCast();
+  auto find = [&](const std::string& id) {
+    for(auto& m : c.npcs)
+      if(m.id == id)
+        return m;
+    FAIL("missing " << id);
+    return CastMember{};
+  };
+  CHECK(find("malcolm").routine.function == "RTN_PRESTART_1368");  // lumberjack pair with Owen
+  CHECK(find("owen").routine.function == "RTN_PRESTART_1367");
+  CHECK(find("angus").routine.state == "ZS_SMALLTALK");
+  CHECK_FALSE(find("angus").routine.waypoint.empty());
+  CHECK(find("greg").routine.empty());  // original routine kept
+}

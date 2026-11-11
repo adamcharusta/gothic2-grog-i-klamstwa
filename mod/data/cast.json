@@ -5,82 +5,164 @@
     {
       "id": "greg",
       "name": "Greg",
-      "instance": "PIR_1320_ADDON_GREG"
+      "instance": "PIR_1320_ADDON_GREG",
+      "hangout": {
+        "en": "stands in front of his hut",
+        "pl": "stoi przed swoją chatą"
+      }
     },
     {
       "id": "francis",
       "name": "Francis",
-      "instance": "PIR_1350_ADDON_FRANCIS"
+      "instance": "PIR_1350_ADDON_FRANCIS",
+      "hangout": {
+        "en": "sits on the bench in front of one of the huts in the camp",
+        "pl": "siedzi na ławce przed jedną z chat w obozie"
+      }
     },
     {
       "id": "garett",
       "name": "Garett",
-      "instance": "PIR_1357_ADDON_GARETT"
+      "instance": "PIR_1357_ADDON_GARETT",
+      "hangout": {
+        "en": "by day stands by the hut with the dish tub, at night drinks on the beach by the camp",
+        "pl": "w dzień stoi przy chacie z balią na naczynia, w nocy pije na plaży przy obozie"
+      }
     },
     {
       "id": "samuel",
       "name": "Samuel",
-      "instance": "PIR_1351_ADDON_SAMUEL"
+      "instance": "PIR_1351_ADDON_SAMUEL",
+      "hangout": {
+        "en": "in his cave in the camp, at the still",
+        "pl": "w swojej jaskini w obozie, przy bimbrowni"
+      }
     },
     {
       "id": "alligator_jack",
       "name": "Alligator Jack",
-      "instance": "PIR_1352_ADDON_ALLIGATORJACK"
+      "instance": "PIR_1352_ADDON_ALLIGATORJACK",
+      "hangout": {
+        "en": "hangs around the main path through the camp",
+        "pl": "kręci się przy głównej ścieżce przez obóz"
+      },
+      "routine": {
+        "state": "ZS_STAND_ARMSCROSSED",
+        "waypoint": "ADW_PIRATECAMP_WAY_07"
+      }
     },
     {
       "id": "henry",
       "name": "Henry",
-      "instance": "PIR_1354_ADDON_HENRY"
+      "instance": "PIR_1354_ADDON_HENRY",
+      "hangout": {
+        "en": "guards the passage at the camp entrance",
+        "pl": "pilnuje przejścia przy wejściu do obozu"
+      }
     },
     {
       "id": "morgan",
       "name": "Morgan",
-      "instance": "PIR_1353_ADDON_MORGAN"
+      "instance": "PIR_1353_ADDON_MORGAN",
+      "hangout": {
+        "en": "sleeps in his bed in the cave, almost all day",
+        "pl": "śpi w swojej koi w jaskini, prawie cały dzień"
+      }
     },
     {
       "id": "bill",
       "name": "Bill",
-      "instance": "PIR_1356_ADDON_BILL"
+      "instance": "PIR_1356_ADDON_BILL",
+      "hangout": {
+        "en": "saws planks at the saw in the camp",
+        "pl": "piłuje deski przy pile w obozie"
+      }
     },
     {
       "id": "brandon",
       "name": "Brandon",
-      "instance": "PIR_1366_ADDON_BRANDON"
+      "instance": "PIR_1366_ADDON_BRANDON",
+      "hangout": {
+        "en": "by day chats on the beach by the camp (with Angus and Hank), at night sits by the fire on the beach",
+        "pl": "w dzień gada na plaży przy obozie (z Angusem i Hankiem), w nocy siedzi przy ognisku na plaży"
+      }
     },
     {
       "id": "matt",
       "name": "Matt",
-      "instance": "PIR_1365_ADDON_MATT"
+      "instance": "PIR_1365_ADDON_MATT",
+      "hangout": {
+        "en": "chats and drinks on the beach by the camp",
+        "pl": "gada i pije na plaży przy obozie"
+      }
     },
     {
       "id": "owen",
       "name": "Owen",
-      "instance": "PIR_1367_ADDON_OWEN"
+      "instance": "PIR_1367_ADDON_OWEN",
+      "hangout": {
+        "en": "at the lumber camp just outside the palisade, sawing wood or resting by the fire there, with Malcolm",
+        "pl": "w obozie drwali tuż za palisadą, piłuje drewno albo odpoczywa tam przy ognisku, razem z Malcolmem"
+      },
+      "routine": {
+        "function": "RTN_PRESTART_1367"
+      }
     },
     {
       "id": "malcolm",
       "name": "Malcolm",
-      "instance": "PIR_1368_ADDON_MALCOM"
+      "instance": "PIR_1368_ADDON_MALCOM",
+      "hangout": {
+        "en": "at the lumber camp just outside the palisade, sawing wood or resting by the fire there, with Owen",
+        "pl": "w obozie drwali tuż za palisadą, piłuje drewno albo odpoczywa tam przy ognisku, razem z Owenem"
+      },
+      "routine": {
+        "function": "RTN_PRESTART_1368"
+      }
     },
     {
       "id": "skip",
       "name": "Skip",
-      "instance": "PIR_1355_ADDON_SKIP"
+      "instance": "PIR_1355_ADDON_SKIP",
+      "hangout": {
+        "en": "stands by Garett's storage hut",
+        "pl": "stoi przy składzie Garetta"
+      }
     },
     {
       "id": "angus",
       "name": "Angus",
-      "instance": "PIR_1370_ADDON_ANGUS"
+      "instance": "PIR_1370_ADDON_ANGUS",
+      "hangout": {
+        "en": "chats with Hank on the beach by the camp",
+        "pl": "gada z Hankiem na plaży przy obozie"
+      },
+      "routine": {
+        "state": "ZS_SMALLTALK",
+        "waypoint": "ADW_PIRATECAMP_BEACH_06"
+      }
     },
     {
       "id": "hank",
       "name": "Hank",
-      "instance": "PIR_1371_ADDON_HANK"
+      "instance": "PIR_1371_ADDON_HANK",
+      "hangout": {
+        "en": "chats with Angus on the beach by the camp",
+        "pl": "gada z Angusem na plaży przy obozie"
+      },
+      "routine": {
+        "state": "ZS_SMALLTALK",
+        "waypoint": "ADW_PIRATECAMP_BEACH_06"
+      }
     },
     {
       "id": "bones",
       "name": "Bones",
-      "instance": "PIR_1362_ADDON_BONES"
+      "instance": "PIR_1362_ADDON_BONES",
+      "hangout": {
+        "en": "practises sword fighting at the training spot in the camp",
+        "pl": "ćwiczy walkę mieczem na placu ćwiczeń w obozie"
+      }
     }
   ],
   "motives": [

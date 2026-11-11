@@ -55,3 +55,10 @@ TEST_CASE("card items exist in items.json") {
       CHECK(d.items.count(item));
     }
 }
+
+TEST_CASE("playtest 2: start.json has a first quest entry in both languages") {
+  GameData d = data();
+  CHECK(d.start.firstQuest.count("pl"));
+  CHECK(d.start.firstQuest.count("en"));
+  CHECK(d.start.firstQuest["pl"].find("Greg") != std::string::npos);
+}

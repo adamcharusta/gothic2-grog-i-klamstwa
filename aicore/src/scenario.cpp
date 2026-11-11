@@ -56,8 +56,17 @@ Result<Cast> loadCast(const json& cast, const json& places) {
   if(cast.value("schema", 0) != 1 || places.value("schema", 0) != 1)
     return Error{ErrorKind::Io, "cast.json/places.json: unsupported schema"};
   c.questGiver = cast.value("quest_giver", "");
-  for(auto& n : cast.value("npcs", json::array()))
-    c.npcs.push_back({n.value("id", ""), n.value("name", ""), n.value("instance", "")});
+  for(auto& n : cast.value("npcs", json::array())) {
+    CastMember m{n.value("id", ""), n.value("name", ""), n.value("instance", ""), {}, {}};
+    const json hangout = n.value("hangout", json::object());
+    for(auto& [lang, text] : hangout.items())
+      m.hangout[lang] = text.get<std::string>();
+    const json r = n.value("routine", json::object());
+    m.routine = {r.value("function", ""), r.value("state", ""), r.value("waypoint", "")};
+    if(!m.routine.state.empty() && m.routine.waypoint.empty())
+      return Error{ErrorKind::Io, "cast.json: routine.state needs routine.waypoint (" + m.id + ")"};
+    c.npcs.push_back(std::move(m));
+  }
   for(auto& m : cast.value("motives", json::array()))
     c.motives.push_back(m.get<std::string>());
   for(auto& p : places.value("places", json::array())) {

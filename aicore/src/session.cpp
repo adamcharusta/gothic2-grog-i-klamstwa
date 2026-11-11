@@ -127,6 +127,13 @@ Result<GameData> loadGameData(const fs::path& dir) {
       d.start.items.push_back({inst, n.get<int>()});
     }
   }
+  if(sj.contains("first_quest")) {
+    if(!sj["first_quest"].is_object())
+      return Error{ErrorKind::Io, "start.json: 'first_quest' must be an object {pl: text, en: text}"};
+    for(auto& [lang, text] : sj["first_quest"].items())
+      if(text.is_string() && !text.get<std::string>().empty())
+        d.start.firstQuest[lang] = text.get<std::string>();
+  }
 
   if(fs::exists(dir / "pricing.json")) {
     auto pj = readJson(dir / "pricing.json");
@@ -153,6 +160,9 @@ GameSession::GameSession(AiConfig config, GameData data, ILlmProvider& actor, IL
     for(auto& item : card.items)
       if(!world_.itemHolder.count(item))
         world_.itemHolder[item] = id;
+  // New game: tell the player where to start. A loaded save replaces the whole world state.
+  if(auto it = data_.start.firstQuest.find(languageName(config_.language)); it != data_.start.firstQuest.end())
+    world_.quests.push_back({"tankard", it->second, 0});
   telemetry_.session(world_.scenario, config_);
 }
 

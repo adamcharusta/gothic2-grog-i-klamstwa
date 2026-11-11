@@ -56,8 +56,8 @@ TEST_CASE("a valid reply is spoken, applied and remembered") {
   REQUIRE(r.verdicts.size() == 2);
   CHECK(r.verdicts[0].accepted);
   auto& w = f.session->world();
-  REQUIRE(w.quests.size() == 1);
-  CHECK(w.quests[0].text == "Porozmawiaj ze Skipem.");
+  REQUIRE(w.quests.size() == 2);  // [0] is the first quest from start.json
+  CHECK(w.quests[1].text == "Porozmawiaj ze Skipem.");
   CHECK(w.npcs.at("greg").attitude == 1);
   REQUIRE(w.npcs.at("greg").memory.size() == 2);
   CHECK(w.npcs.at("greg").memory[0].text == "Kogo widziałeś przy chacie?");

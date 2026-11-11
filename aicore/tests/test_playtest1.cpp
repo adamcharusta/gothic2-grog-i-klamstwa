@@ -201,3 +201,16 @@ TEST_CASE("playtest: actor rules tell pirates to take up brawls and not to inven
     CHECK(d.actorRules.find(field) != std::string::npos);
   CHECK(d.directorRules.find("`npc`") != std::string::npos);
 }
+
+TEST_CASE("playtest 2: a new game starts with the 'talk to Greg' entry in the player's language") {
+  Fx f;  // default language
+  REQUIRE(f.s->world().quests.size() == 1);
+  CHECK(f.s->world().quests[0].quest == "tankard");
+  CHECK(f.s->world().quests[0].text == f.d.start.firstQuest.at(languageName(AiConfig{}.language)));
+
+  AiConfig en;
+  en.language = Language::En;
+  GameSession s(en, f.d, f.actor, f.director, f.tel, 8);
+  REQUIRE(s.world().quests.size() == 1);
+  CHECK(s.world().quests[0].text == f.d.start.firstQuest.at("en"));
+}
