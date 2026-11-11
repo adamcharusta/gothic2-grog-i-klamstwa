@@ -40,6 +40,20 @@ clones the original Polish dub locally from the player's own game files.
 - openedai-speech is archived; the README says so. A maintained local server could be tested later.
 - `pricing.json` TTS price is an estimate.
 
+## Final review fixes
+Whole-branch review of Plan 6, all findings fixed in aicore and docs (no engine change):
+- Streamed WAVs: `normalizeWav` (`aicore/src/tts.cpp`) rewrites placeholder (0xFFFFFFFF) RIFF/data sizes, trims the data to
+  the bytes present (whole frames, even pad byte), drops chunks after the data; anything but 8/16-bit mono/stereo PCM is a
+  `BadResponse` (the engine's Tempest decoder cannot play it). Cache files that are not already normalised are misses.
+- Voice hint for `Config` (HTTP 400/404 from the TTS server), PL + EN.
+- Backoff: Auth/Config/BadResponse turn the voice off for the session at once, other errors after 2 in a row (a success
+  resets the count); one `{"kind":"tts","disabled":true,"reason":...}` line; reset on `loadState`.
+- Fallback lines are cached (decision 8); `farewellAsync` picks the line before starting the worker.
+- Negative key-reuse tests (other `base_url`, `[ai] provider = anthropic`); `Speech` comment; README (EN/PL): Kokoro
+  caveat, section wording, Polish-only original voices, delete `tts_cache` after re-extracting, exit code 3 effects.
+- Verified: `tools\dev\aicore.cmd` 165/165 doctest cases green (new tests written first and seen failing);
+  `bash tools/tests/run.sh` ALL TESTS PASSED. Not verified in game.
+
 ## Playtest 3 checklist
 Open playtest-2 fixes (work/0014), voice off:
 - [ ] Malcolm and Owen stand at the lumber camp; NPCs do not send the player to an empty place.
