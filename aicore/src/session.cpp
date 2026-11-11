@@ -4,6 +4,7 @@
 #include <grog/ai/hints.h>
 
 #include <algorithm>
+#include <atomic>
 
 namespace grog::ai {
 using nlohmann::json;
@@ -179,10 +180,33 @@ WorldState GameSession::worldSnapshot() {
 
 TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLine, int64_t gameTimeS) {
   std::string npc(npcView);
+  uint64_t gen = 0;
+  bool voiceable = false;
+  TurnResult out = answer(npc, playerLine, gameTimeS, gen, voiceable);
+  if(!voiceable || tts_.load() == nullptr)
+    return out;
+  // The reply is already applied; synthesis runs without the lock, like the LLM call.
+  Voiced v = voice(npc, out.speech, false);
+  std::lock_guard<std::mutex> lock(mu_);
+  if(gen != generation_) {  // a save was loaded while the audio was made: drop it with the turn's effects
+    out.error = Error{ErrorKind::Validation, "answer discarded: the game state was reloaded"};
+    out.verdicts.clear();
+    out.endDialog = false;
+    return out;
+  }
+  out.audioWav = std::move(v.wav);
+  if(out.hint.empty())  // LLM hints come first; an unshown voice hint waits for a later turn
+    out.hint = takeVoiceHint(v.error);
+  return out;
+}
+
+TurnResult GameSession::answer(std::string_view npcView, std::string_view playerLine, int64_t gameTimeS,
+                               uint64_t& gen, bool& voiceable) {
+  std::string npc(npcView);
   TurnResult out;
   LlmRequest req;
   const NpcCard* card = nullptr;
-  uint64_t gen = 0;
+  voiceable = false;
   {
     std::lock_guard<std::mutex> lock(mu_);
     auto it = data_.cards.find(npc);
@@ -257,6 +281,7 @@ TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLi
       out.endDialog = reply->endDialog;
       out.verdicts = std::move(verdicts);
       telemetry_.verdicts(npc, out.verdicts);
+      voiceable = true;
       return out;
     } catch(const std::exception& e) {
       out.error = Error{ErrorKind::BadResponse, std::string("reply could not be applied: ") + e.what()};
@@ -273,6 +298,7 @@ TurnResult GameSession::talk(std::string_view npcView, std::string_view playerLi
   out.speech = fallbackLine(*card);
   out.gesture = "think";
   telemetry_.event("fallback", {{"npc", npc}, {"reason", out.error ? errorKindName(out.error->kind) : "unknown"}});
+  voiceable = true;
   return out;
 }
 
@@ -462,7 +488,14 @@ nlohmann::json GameSession::summary() {
           {"provider", providerKindName(config_.actor.kind)},
           {"model", config_.actor.model},
           {"director_model", config_.director.model},
-          {"quest_entries", world_.quests.size()}};
+          {"quest_entries", world_.quests.size()},
+          {"tts_requests", stats_.ttsRequests},
+          {"tts_errors", stats_.ttsErrors},
+          {"tts_audio_s", stats_.ttsAudioMs / 1000.0},
+          {"tts_cost_usd", stats_.ttsCostUsd},
+          {"tts_latency_avg_ms", stats_.ttsRequests > stats_.ttsErrors
+                                     ? stats_.ttsLatencySumMs / (stats_.ttsRequests - stats_.ttsErrors)
+                                     : 0.0}};
 }
 
 nlohmann::json GameSession::saveState() {
@@ -483,6 +516,11 @@ nlohmann::json GameSession::saveState() {
             {"cost_usd", stats_.costUsd},
             {"latency_sum_ms", stats_.latencySumMs},
             {"latency_max_ms", stats_.latencyMaxMs},
+            {"tts_requests", stats_.ttsRequests},
+            {"tts_errors", stats_.ttsErrors},
+            {"tts_audio_ms", stats_.ttsAudioMs},
+            {"tts_cost_usd", stats_.ttsCostUsd},
+            {"tts_latency_sum_ms", stats_.ttsLatencySumMs},
             {"play_time_s", lastGameT_}}}};
 }
 
@@ -512,6 +550,12 @@ Result<bool> GameSession::loadState(const nlohmann::json& j) {
     stats_.costUsd = st.value("cost_usd", 0.0);
     stats_.latencySumMs = st.value("latency_sum_ms", 0.0);
     stats_.latencyMaxMs = st.value("latency_max_ms", 0.0);
+    // Added in Plan 6.
+    stats_.ttsRequests = st.value("tts_requests", 0);
+    stats_.ttsErrors = st.value("tts_errors", 0);
+    stats_.ttsAudioMs = st.value("tts_audio_ms", 0LL);
+    stats_.ttsCostUsd = st.value("tts_cost_usd", 0.0);
+    stats_.ttsLatencySumMs = st.value("tts_latency_sum_ms", 0.0);
     lastGameT_ = st.at("play_time_s").get<int64_t>();
     directorInFlight_ = false;
     ++generation_;
@@ -527,6 +571,143 @@ std::string GameSession::farewell(std::string_view npc) {
   if(it == data_.cards.end())
     return "...";
   return rng_.pick(it->second.farewells.at(config_.language));
+}
+
+void GameSession::setTts(ITtsProvider* tts) { tts_.store(tts); }
+
+std::future<Speech> GameSession::speakAsync(std::string npc, std::string textUtf8, bool cacheable) {
+  uint64_t gen = 0;
+  {
+    std::lock_guard<std::mutex> lock(mu_);
+    gen = generation_;
+  }
+  return std::async(std::launch::async, [this, npc = std::move(npc), text = std::move(textUtf8), cacheable, gen]() {
+    return speak(npc, text, cacheable, gen);
+  });
+}
+
+std::future<Speech> GameSession::farewellAsync(std::string npc) {
+  uint64_t gen = 0;
+  {
+    std::lock_guard<std::mutex> lock(mu_);
+    gen = generation_;
+  }
+  return std::async(std::launch::async, [this, npc = std::move(npc), gen]() {
+    return speak(npc, farewell(npc), true, gen);
+  });
+}
+
+Speech GameSession::speak(const std::string& npc, std::string text, bool cacheable, uint64_t gen) {
+  Voiced v = voice(npc, text, cacheable);
+  std::lock_guard<std::mutex> lock(mu_);
+  if(gen != generation_)
+    return {};  // a save was loaded meanwhile: this line belongs to another timeline
+  return Speech{std::move(text), std::move(v.wav), takeVoiceHint(v.error)};
+}
+
+std::string GameSession::takeVoiceHint(const std::optional<ErrorKind>& error) {
+  if(!error || hintedTts_.count(*error))
+    return {};
+  std::string h = voiceHint(*error, config_.language);
+  if(!h.empty())
+    hintedTts_.insert(*error);
+  return h;
+}
+
+namespace {
+uint64_t fnv1a64(std::string_view s, uint64_t h = 0xcbf29ce484222325ULL) {
+  for(unsigned char c : s) {
+    h ^= c;
+    h *= 0x100000001b3ULL;
+  }
+  return h;
+}
+
+std::string hex64(uint64_t v) {
+  static const char* digits = "0123456789abcdef";
+  std::string out(16, '0');
+  for(int i = 15; i >= 0; --i, v >>= 4)
+    out[i] = digits[v & 0xF];
+  return out;
+}
+
+// Temp file + rename, so a reader never sees half a file. Failures only cost a later re-synthesis.
+void writeCacheFile(const fs::path& file, const std::string& wav) {
+  static std::atomic<unsigned> counter{0};
+  std::error_code ec;
+  fs::create_directories(file.parent_path(), ec);
+  fs::path tmp = file;
+  tmp += pathFromUtf8(".tmp" + std::to_string(counter++));
+  if(!writeTextFile(tmp, wav).ok()) {
+    fs::remove(tmp, ec);
+    return;
+  }
+  fs::rename(tmp, file, ec);
+  if(ec)
+    fs::remove(tmp, ec);
+}
+}  // namespace
+
+GameSession::Voiced GameSession::voice(const std::string& npc, const std::string& text, bool cacheable) {
+  ITtsProvider* tts = tts_.load();
+  if(tts == nullptr || text.find_first_not_of(" .") == std::string::npos)
+    return {};
+  // data_ and config_ never change after construction: no lock needed.
+  TtsRequest req;
+  req.text = text;
+  req.voice = "ash";
+  if(auto it = data_.cards.find(npc); it != data_.cards.end()) {
+    const NpcVoice& nv = it->second.voice;
+    if(!nv.name.empty())
+      req.voice = nv.name;
+    if(auto st = nv.style.find(languageName(config_.language)); st != nv.style.end())
+      req.instructions = st->second;
+  }
+  const std::string model(tts->model());
+  const size_t chars = utf8Length(text);
+
+  fs::path file;
+  if(cacheable && !config_.tts.cacheDir.empty()) {
+    // The key covers everything that changes the audio, never the API key.
+    uint64_t h = fnv1a64(model);
+    for(const std::string* part : {&req.voice, &req.instructions, &req.text})
+      h = fnv1a64(*part, fnv1a64(std::string_view("\n", 1), h));
+    file = pathFromUtf8(config_.tts.cacheDir) / pathFromUtf8(hex64(h) + ".wav");
+    std::error_code ec;
+    if(fs::is_regular_file(file, ec)) {
+      auto cached = readTextFile(file);
+      if(cached.ok()) {
+        if(auto ms = wavDurationMs(cached.value())) {  // anything else is a miss
+          TtsReply r;
+          r.wav = std::move(cached.value());
+          r.audioMs = *ms;
+          r.model = model;
+          Result<TtsReply> res(std::move(r));
+          telemetry_.tts(npc, model, res, chars, true);
+          return {std::move(res.value().wav), std::nullopt};
+        }
+      }
+    }
+  }
+
+  auto res = tts->synthesize(req);
+  double cost = telemetry_.tts(npc, model, res, chars, false);
+  {
+    std::lock_guard<std::mutex> lock(mu_);
+    ++stats_.ttsRequests;
+    if(res.ok()) {
+      stats_.ttsAudioMs += res.value().audioMs;
+      stats_.ttsCostUsd += cost;
+      stats_.ttsLatencySumMs += res.value().latencyMs;
+    } else {
+      ++stats_.ttsErrors;
+    }
+  }
+  if(!res.ok())
+    return {"", res.error().kind};
+  if(!file.empty() && !res.value().wav.empty())
+    writeCacheFile(file, res.value().wav);
+  return {std::move(res.value().wav), std::nullopt};
 }
 
 }  // namespace grog::ai

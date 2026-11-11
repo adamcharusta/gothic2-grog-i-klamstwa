@@ -27,4 +27,25 @@ std::string playerHint(ErrorKind kind, Language lang) {
   }
 }
 
+std::string voiceHint(ErrorKind kind, Language lang) {
+  const bool pl = lang == Language::Pl;
+  switch(kind) {
+    case ErrorKind::Auth:
+      return pl ? "Klucz głosu został odrzucony - sprawdź api_key w sekcji [tts] w GrogAI.ini. Zostają same napisy."
+                : "The voice API key was rejected - check api_key in the [tts] section of GrogAI.ini. Subtitles only.";
+    case ErrorKind::RateLimit:
+      return pl ? "Limit głosu wyczerpany (limit albo brak środków) - zostają same napisy."
+                : "Voice limit reached (rate limit or no credit) - subtitles only.";
+    case ErrorKind::Network:
+    case ErrorKind::Timeout:
+    case ErrorKind::Server:
+      return pl ? "Głos jest niedostępny - zostają same napisy." : "Voice unavailable - subtitles only.";
+    case ErrorKind::BadResponse:
+      return pl ? "Serwer głosu musi zwracać WAV (response_format=wav) - zostają same napisy."
+                : "The voice server must return WAV (response_format=wav) - subtitles only.";
+    default:
+      return {};
+  }
+}
+
 }  // namespace grog::ai
