@@ -40,4 +40,18 @@ else
 fi
 assert_ok "engine-upstream.md records an upstream SHA" -- grep -Eq '[0-9a-f]{40}' docs/engine-upstream.md
 
+# README provider guides (both languages)
+for readme in README.md README.pl.md; do
+  r="$(cat "$readme" 2>/dev/null)"
+  for p in "Anthropic" "OpenAI" "DeepSeek" "OpenRouter" "Gemini" "Ollama" "LM Studio" \
+           "https://api.openai.com/v1" "https://api.deepseek.com" "https://openrouter.ai/api/v1" \
+           "https://generativelanguage.googleapis.com/v1beta/openai" "http://localhost:11434/v1" "http://localhost:1234/v1" \
+           "gpt-4.1-mini" "aggregate.py"; do
+    assert_contains "$r" "$p" "$readme mentions $p"
+  done
+done
+assert_contains "$(cat README.md)" "## Tested models" "README.md tested models section"
+assert_contains "$(cat README.pl.md)" "## Przetestowane modele" "README.pl.md tested models section"
+assert_contains "$(cat GrogAI.example.ini)" "required for openai_compatible" "example ini: base_url required for openai_compatible"
+
 finish

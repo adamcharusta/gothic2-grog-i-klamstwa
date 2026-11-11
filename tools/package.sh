@@ -54,6 +54,9 @@ cp "$root/packaging/THIRD_PARTY.md" "$stage/LICENSES/THIRD_PARTY.md"
 # Campaign data read by the engine at runtime (<root>/mod/data).
 mkdir -p "$stage/mod"
 cp -r "$root/mod/data" "$stage/mod/data"
+# Benchmark log aggregation (README: python tools/bench/aggregate.py logs).
+mkdir -p "$stage/tools/bench"
+cp "$root/tools/bench/aggregate.py" "$stage/tools/bench/"
 
 # Refuse forbidden content: AI key files, original game files, API keys in text files.
 forbidden="$(cd "$stage" && {

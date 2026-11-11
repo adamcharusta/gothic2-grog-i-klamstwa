@@ -29,7 +29,7 @@ D="GrogIKlamstwa-0.1.0-beta.3-win64"
 for p in bin/Gothic2Notr.exe bin/libstdc++-6.dll system/GrogIKlamstwa.ini Start-GrogIKlamstwa.bat \
          GrogAI.example.ini VERSION README.md README.pl.md \
          LICENSES/LICENSE LICENSES/OpenGothic-LICENSE LICENSES/THIRD_PARTY.md \
-         mod/data/cast.json mod/data/npc/greg.json mod/data/rules/actor.md; do
+         mod/data/cast.json mod/data/npc/greg.json mod/data/rules/actor.md tools/bench/aggregate.py; do
   assert_contains "$list" "$D/$p" "zip contains $p"
 done
 STAGE="$TMP/out ł/$D"
